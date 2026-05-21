@@ -21,5 +21,4 @@ export interface Recipe {
   fatLossScore: number; // 1..5
   steps: RecipeStep[];
   videoUrl?: string;
-  articleUrl?: string;
 }

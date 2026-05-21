@@ -109,17 +109,6 @@ export default function RecipeDetailPage({ params }: PageProps) {
               🎥 看视频版
             </a>
           )}
-          {recipe.articleUrl && (
-            <a
-              href={recipe.articleUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-full text-sm border"
-              style={{ borderColor: "var(--color-border)" }}
-            >
-              📒 看图文版
-            </a>
-          )}
         </div>
       </section>
 
