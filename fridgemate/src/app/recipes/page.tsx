@@ -9,6 +9,7 @@ import { IngredientChip } from "@/components/IngredientChip";
 import { MatchCircles } from "@/components/MatchCircles";
 import { SlotMachine } from "@/components/SlotMachine";
 import type { ScoredRecipe } from "@/lib/match";
+import type { Recipe } from "@/types";
 
 type SortMode = "score" | "fatLoss" | "time" | "coverage";
 
@@ -17,7 +18,7 @@ export default function RecipesPage() {
   const { selectedIds, toggleSelect } = useFridgeStore();
   const { rankedForSelected, slotCandidates } = useRecipeStore();
   const [sort, setSort] = useState<SortMode>("score");
-  const [showSlot, setShowSlot] = useState(false);
+  const [slotFinal, setSlotFinal] = useState<Recipe | null>(null);
 
   const sorted = [...rankedForSelected].sort((a, b) => {
     switch (sort) {
@@ -32,15 +33,16 @@ export default function RecipesPage() {
     }
   });
 
-  const handleSlotPick = (r: { id: string }) => {
-    setShowSlot(false);
-    router.push(`/recipes/${r.id}`);
+  const handleSlotLaunch = () => {
+    if (slotCandidates.length === 0) return;
+    const idx = Math.floor(Math.random() * slotCandidates.length);
+    setSlotFinal(slotCandidates[idx].recipe);
   };
 
-  const slotFinal =
-    slotCandidates.length > 0
-      ? slotCandidates[Math.floor(Math.random() * slotCandidates.length)]
-      : null;
+  const handleSlotPick = (r: { id: string }) => {
+    setSlotFinal(null);
+    router.push(`/recipes/${r.id}`);
+  };
 
   return (
     <main className="px-4 py-6 flex flex-col gap-4">
@@ -79,9 +81,9 @@ export default function RecipesPage() {
         </div>
       )}
 
-      {slotFinal && (
+      {slotCandidates.length > 0 && (
         <button
-          onClick={() => setShowSlot(true)}
+          onClick={handleSlotLaunch}
           className="rounded-2xl py-5 px-6 text-white text-lg font-semibold flex flex-col items-center gap-1"
           style={{ backgroundColor: "var(--color-accent)" }}
         >
@@ -123,10 +125,10 @@ export default function RecipesPage() {
         ))}
       </ul>
 
-      {showSlot && slotFinal && (
+      {slotFinal && (
         <SlotMachine
           candidates={slotCandidates.map((c) => c.recipe)}
-          finalPick={slotFinal.recipe}
+          finalPick={slotFinal}
           onDone={handleSlotPick}
         />
       )}

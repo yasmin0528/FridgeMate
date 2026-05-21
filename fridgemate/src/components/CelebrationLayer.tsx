@@ -22,6 +22,20 @@ const ENCOURAGEMENT = [
   "晚饭做完了，今天提前打卡",
 ];
 
+interface ParticleSpec {
+  x: number;
+  y: number;
+  rotate: number;
+}
+
+function buildParticles(count: number): ParticleSpec[] {
+  return Array.from({ length: count }, () => ({
+    x: (Math.random() - 0.5) * 600,
+    y: (Math.random() - 0.5) * 800,
+    rotate: Math.random() * 720,
+  }));
+}
+
 export function CelebrationLayer({
   oldStreak,
   newStreak,
@@ -29,8 +43,9 @@ export function CelebrationLayer({
 }: Props) {
   const [displayStreak, setDisplayStreak] = useState(oldStreak);
   const [message] = useState(
-    ENCOURAGEMENT[Math.floor(Math.random() * ENCOURAGEMENT.length)]
+    () => ENCOURAGEMENT[Math.floor(Math.random() * ENCOURAGEMENT.length)]
   );
+  const [particles] = useState<ParticleSpec[]>(() => buildParticles(20));
 
   useEffect(() => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -61,7 +76,7 @@ export function CelebrationLayer({
       }}
       onClick={onDismiss}
     >
-      {Array.from({ length: 20 }).map((_, i) => (
+      {particles.map((p, i) => (
         <motion.span
           key={i}
           className="absolute text-3xl"
@@ -72,11 +87,11 @@ export function CelebrationLayer({
             scale: 0,
           }}
           animate={{
-            x: (Math.random() - 0.5) * 600,
-            y: (Math.random() - 0.5) * 800,
+            x: p.x,
+            y: p.y,
             opacity: 0,
             scale: 1.5,
-            rotate: Math.random() * 720,
+            rotate: p.rotate,
           }}
           transition={{
             duration: 2.5,
