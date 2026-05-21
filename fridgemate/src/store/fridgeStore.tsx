@@ -11,18 +11,18 @@ import {
 import type { Ingredient } from "@/types";
 import { MOCK_INGREDIENTS } from "@/mock/ingredients";
 
-interface InventoryItem {
+export interface InventoryItem {
   ingredientId: string;
   qty: number;
   addedAt: number;
 }
 
-interface FridgeState {
+export interface FridgeState {
   inventory: InventoryItem[];
   selectedIds: string[];
 }
 
-type Action =
+export type FridgeAction =
   | { type: "ADD_ITEMS"; items: { ingredientId: string; qty: number }[] }
   | { type: "REMOVE_ITEM"; ingredientId: string }
   | { type: "TOGGLE_SELECT"; ingredientId: string }
@@ -38,14 +38,18 @@ const INITIAL: FridgeState = {
   selectedIds: [],
 };
 
-function reducer(s: FridgeState, a: Action): FridgeState {
+export function fridgeReducer(s: FridgeState, a: FridgeAction): FridgeState {
   switch (a.type) {
     case "ADD_ITEMS": {
       const existing = new Map(s.inventory.map((it) => [it.ingredientId, it]));
       for (const add of a.items) {
         const prev = existing.get(add.ingredientId);
-        if (prev) prev.qty += add.qty;
-        else existing.set(add.ingredientId, { ...add, addedAt: Date.now() });
+        if (prev) {
+          // Replace with a new object — never mutate the existing one
+          existing.set(add.ingredientId, { ...prev, qty: prev.qty + add.qty });
+        } else {
+          existing.set(add.ingredientId, { ...add, addedAt: Date.now() });
+        }
       }
       return { ...s, inventory: [...existing.values()] };
     }
@@ -93,7 +97,7 @@ interface PersistedState {
 }
 
 export function FridgeProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, INITIAL);
+  const [state, dispatch] = useReducer(fridgeReducer, INITIAL);
 
   useEffect(() => {
     const raw =

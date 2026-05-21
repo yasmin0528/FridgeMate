@@ -10,13 +10,13 @@ import {
 } from "react";
 import type { CookingDoneEvent } from "@/types";
 
-interface CheckinState {
+export interface CheckinState {
   history: CookingDoneEvent[];
   lastCookedDate: string | null; // YYYY-MM-DD
   streak: number;
 }
 
-type Action =
+export type CheckinAction =
   | { type: "RECORD"; event: CookingDoneEvent }
   | { type: "HYDRATE"; state: CheckinState };
 
@@ -26,14 +26,14 @@ const INITIAL: CheckinState = {
   streak: 0,
 };
 
-function dateKey(ts: number): string {
+export function dateKey(ts: number): string {
   const d = new Date(ts);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
     d.getDate()
   ).padStart(2, "0")}`;
 }
 
-function computeNextStreak(
+export function computeNextStreak(
   prevDate: string | null,
   prevStreak: number,
   today: string
@@ -48,7 +48,7 @@ function computeNextStreak(
   return diffDays === 1 ? prevStreak + 1 : 1;
 }
 
-function reducer(s: CheckinState, a: Action): CheckinState {
+export function checkinReducer(s: CheckinState, a: CheckinAction): CheckinState {
   switch (a.type) {
     case "RECORD": {
       const today = dateKey(a.event.timestamp);
@@ -74,7 +74,7 @@ const CheckinContext = createContext<CheckinContextValue | null>(null);
 const STORAGE_KEY = "fridgemate:checkin";
 
 export function CheckinProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, INITIAL);
+  const [state, dispatch] = useReducer(checkinReducer, INITIAL);
 
   useEffect(() => {
     const raw =

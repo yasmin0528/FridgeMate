@@ -66,4 +66,54 @@ describe("cosineSimilarity", () => {
     expect(cosineSimilarity(new Set(), new Set(["a"]), idf)).toBe(0);
     expect(cosineSimilarity(new Set(["a"]), new Set(), idf)).toBe(0);
   });
+
+  it("is symmetric: cos(a, b) === cos(b, a)", () => {
+    const a = new Set(["chicken", "broccoli"]);
+    const b = new Set(["chicken", "salt"]);
+    expect(cosineSimilarity(a, b, idf)).toBeCloseTo(cosineSimilarity(b, a, idf));
+  });
+
+  it("treats unknown ingredients as zero weight (no NaN)", () => {
+    const sim = cosineSimilarity(
+      new Set(["unknown_ingredient"]),
+      new Set(["chicken"]),
+      idf
+    );
+    // No overlap on weighted dimensions → 0
+    expect(sim).toBe(0);
+    expect(Number.isNaN(sim)).toBe(false);
+  });
+
+  it("returns 0 (not NaN) when both sides only contain zero-weight ingredients", () => {
+    const zeroIdf = new Map([["common", 0]]);
+    const sim = cosineSimilarity(new Set(["common"]), new Set(["common"]), zeroIdf);
+    expect(sim).toBe(0);
+    expect(Number.isNaN(sim)).toBe(false);
+  });
+});
+
+describe("computeIDF · edge cases", () => {
+  it("single-recipe corpus produces IDF=0 for all its ingredients", () => {
+    const idf = computeIDF([["a", "b", "c"]]);
+    // log(1/1) = 0
+    expect(idf.get("a")).toBe(0);
+    expect(idf.get("b")).toBe(0);
+    expect(idf.get("c")).toBe(0);
+  });
+
+  it("ingredient present in every recipe has IDF=0", () => {
+    const idf = computeIDF([
+      ["salt", "a"],
+      ["salt", "b"],
+      ["salt", "c"],
+    ]);
+    expect(idf.get("salt")).toBe(0);
+    expect(idf.get("a")!).toBeGreaterThan(0);
+  });
+
+  it("ignores duplicates within a single recipe", () => {
+    const idf = computeIDF([["a", "a", "a"], ["b"]]);
+    // "a" appears in 1 of 2 recipes despite duplication
+    expect(idf.get("a")!).toBeCloseTo(Math.log(2 / 1));
+  });
 });
