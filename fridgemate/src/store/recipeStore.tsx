@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useMemo, ReactNode } from "react";
 import { MOCK_RECIPES, RECIPE_BY_ID } from "@/mock/recipes";
+import { INGREDIENT_BY_ID } from "@/mock/ingredients";
 import { computeIDF } from "@/lib/tfidf";
 import {
   rankRecipes,
   slotMachineCandidates,
+  activeIngredients,
   type ScoredRecipe,
 } from "@/lib/match";
 import type { Recipe } from "@/types";
@@ -25,12 +27,16 @@ export function RecipeProvider({ children }: { children: ReactNode }) {
 
   const idf = useMemo(
     () =>
-      computeIDF(MOCK_RECIPES.map((r) => r.ingredients.map((i) => i.id))),
+      computeIDF(
+        MOCK_RECIPES.map((r) =>
+          activeIngredients(r, INGREDIENT_BY_ID).map((i) => i.id)
+        )
+      ),
     []
   );
 
   const ranked = useMemo(
-    () => rankRecipes(MOCK_RECIPES, selectedSet, idf),
+    () => rankRecipes(MOCK_RECIPES, selectedSet, idf, INGREDIENT_BY_ID),
     [selectedSet, idf]
   );
 
