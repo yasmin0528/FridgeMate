@@ -30,7 +30,7 @@ type Action =
   | { type: "HYDRATE"; state: FridgeState };
 
 const INITIAL: FridgeState = {
-  inventory: MOCK_INGREDIENTS.slice(0, 8).map((i) => ({
+  inventory: MOCK_INGREDIENTS.filter((i) => !i.isPantry).map((i) => ({
     ingredientId: i.id,
     qty: 1,
     addedAt: Date.now(),
