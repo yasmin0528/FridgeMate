@@ -20,14 +20,29 @@ export default function RecipesPage() {
   const [sort, setSort] = useState<SortMode>("score");
   const [slotFinal, setSlotFinal] = useState<Recipe | null>(null);
 
-  const sorted = [...rankedForSelected].sort((a, b) => {
+  // When user has selected ingredients, only show recipes with non-zero coverage.
+  // Otherwise show all recipes so the user can browse.
+  const filtered =
+    selectedIds.length > 0
+      ? rankedForSelected.filter((r) => r.coverage > 0)
+      : rankedForSelected;
+
+  // Sort by the active tab, with coverage as a stable tiebreaker so the
+  // circle indicators don't appear to jump around within ties.
+  const sorted = [...filtered].sort((a, b) => {
     switch (sort) {
       case "score":
         return b.score - a.score;
       case "fatLoss":
-        return b.recipe.fatLossScore - a.recipe.fatLossScore;
+        return (
+          b.recipe.fatLossScore - a.recipe.fatLossScore ||
+          b.coverage - a.coverage
+        );
       case "time":
-        return a.recipe.cookTimeMin - b.recipe.cookTimeMin;
+        return (
+          a.recipe.cookTimeMin - b.recipe.cookTimeMin ||
+          b.coverage - a.coverage
+        );
       case "coverage":
         return b.coverage - a.coverage;
     }

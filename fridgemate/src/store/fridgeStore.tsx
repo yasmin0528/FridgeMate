@@ -85,6 +85,12 @@ interface FridgeContextValue {
 
 const FridgeContext = createContext<FridgeContextValue | null>(null);
 const STORAGE_KEY = "fridgemate:fridge";
+const STORAGE_VERSION = 2; // bump when ingredient schema changes
+
+interface PersistedState {
+  version: number;
+  state: FridgeState;
+}
 
 export function FridgeProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, INITIAL);
@@ -96,7 +102,11 @@ export function FridgeProvider({ children }: { children: ReactNode }) {
         : null;
     if (raw) {
       try {
-        dispatch({ type: "HYDRATE", state: JSON.parse(raw) });
+        const parsed = JSON.parse(raw) as PersistedState;
+        // Discard cached state if schema version mismatched (e.g., upgrading from v1)
+        if (parsed && parsed.version === STORAGE_VERSION && parsed.state) {
+          dispatch({ type: "HYDRATE", state: parsed.state });
+        }
       } catch {
         // ignore corrupted state
       }
@@ -105,7 +115,8 @@ export function FridgeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const wrapper: PersistedState = { version: STORAGE_VERSION, state };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(wrapper));
     }
   }, [state]);
 
