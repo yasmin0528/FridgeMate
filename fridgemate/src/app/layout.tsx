@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/store/Providers";
+import { BottomTab } from "@/components/BottomTab";
 
 export const metadata: Metadata = {
   title: "FridgeMate",
@@ -11,7 +13,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body className="pb-20">
+        <Providers>
+          {children}
+          <BottomTab />
+        </Providers>
+      </body>
     </html>
   );
 }
