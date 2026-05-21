@@ -3,6 +3,7 @@ export type IngredientCategory =
   | "veg"
   | "carb"
   | "seasoning"
+  | "aromatic"
   | "dairy"
   | "fruit";
 
@@ -12,4 +13,5 @@ export interface Ingredient {
   category: IngredientCategory;
   emoji?: string;
   shelfLifeDays?: number;
+  isPantry?: boolean;
 }
