@@ -114,7 +114,26 @@ describe("rankRecipes", () => {
 });
 
 describe("slotMachineCandidates", () => {
-  it("filters out recipes below 0.5 score threshold", () => {
+  it("returns qualified (score>=0.5) recipes when there are at least 5", () => {
+    const recipes = Array.from({ length: 7 }, (_, i) => ({
+      ...recipe,
+      id: `r${i}`,
+    }));
+    const ranked = rankRecipes(
+      recipes,
+      new Set(["chicken_breast", "broccoli", "garlic", "salt"]),
+      idf,
+      baseIngredientMap
+    );
+    const candidates = slotMachineCandidates(ranked);
+    expect(candidates.length).toBeGreaterThanOrEqual(5);
+    for (const c of candidates) {
+      expect(c.score).toBeGreaterThanOrEqual(0.5);
+    }
+  });
+
+  it("falls back to top N by score when qualified is fewer than 5", () => {
+    // Only 2 recipes, single-ingredient match → both score < 0.5
     const r1: Recipe = { ...recipe, id: "r1" };
     const r2: Recipe = { ...recipe, id: "r2" };
     const ranked = rankRecipes(
@@ -124,9 +143,20 @@ describe("slotMachineCandidates", () => {
       baseIngredientMap
     );
     const candidates = slotMachineCandidates(ranked);
-    for (const c of candidates) {
-      expect(c.score).toBeGreaterThanOrEqual(0.5);
-    }
+    // Fallback to all available (capped at 10), not the empty list
+    expect(candidates.length).toBe(2);
+  });
+
+  it("caps fallback pool at 10 recipes", () => {
+    const recipes = Array.from({ length: 28 }, (_, i) => ({
+      ...recipe,
+      id: `r${i}`,
+      // No ingredients → all scores 0
+      ingredients: [],
+    }));
+    const ranked = rankRecipes(recipes, new Set(), idf, baseIngredientMap);
+    const candidates = slotMachineCandidates(ranked);
+    expect(candidates.length).toBe(10);
   });
 });
 

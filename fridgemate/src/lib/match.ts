@@ -65,5 +65,11 @@ export function rankRecipes(
 export function slotMachineCandidates(
   ranked: ScoredRecipe[]
 ): ScoredRecipe[] {
-  return ranked.filter((r) => r.score >= 0.5);
+  // First pass: well-matched recipes (cos×boost ≥ 0.5)
+  const qualified = ranked.filter((r) => r.score >= 0.5);
+  // If there are enough good matches, randomize among them
+  if (qualified.length >= 5) return qualified;
+  // Otherwise widen the pool to top 10 by score so the random pick
+  // doesn't keep landing on the single highest-scored recipe.
+  return ranked.slice(0, Math.min(10, ranked.length));
 }
