@@ -26,7 +26,6 @@ export default function RecipeDetailPage({ params }: PageProps) {
   const [showVisToast, setShowVisToast] = useState(false);
   const leftAtRef = useRef<number | null>(null);
 
-  // visibility detection: if user goes away ≥3s then returns, show toast
   useEffect(() => {
     const onVis = () => {
       if (document.visibilityState === "hidden") {
@@ -54,13 +53,26 @@ export default function RecipeDetailPage({ params }: PageProps) {
 
   const doCheckin = () => {
     const { oldStreak, newStreak } = recordCooking(recipe.id);
-    router.push(
-      `/recipes/${recipe.id}/done?old=${oldStreak}&new=${newStreak}`
-    );
+    router.push(`/recipes/${recipe.id}/done?old=${oldStreak}&new=${newStreak}`);
   };
+
+  // Split ingredients into fridge vs pantry
+  const fridgeIngredients = recipe.ingredients.filter((ref) => {
+    const ing = INGREDIENT_BY_ID.get(ref.id);
+    return ing && !ing.isPantry;
+  });
+  const pantryIngredients = recipe.ingredients.filter((ref) => {
+    const ing = INGREDIENT_BY_ID.get(ref.id);
+    return ing && ing.isPantry;
+  });
 
   const isLastStep = stepIdx === recipe.steps.length - 1;
   const step = recipe.steps[stepIdx];
+
+  // External link card
+  const searchUrl = `https://search.bilibili.com/all?keyword=${encodeURIComponent(recipe.name)}`;
+  const hasRealVideo = !!recipe.videoUrl;
+  const videoHref = recipe.videoUrl ?? searchUrl;
 
   return (
     <main className="flex flex-col">
@@ -97,56 +109,118 @@ export default function RecipeDetailPage({ params }: PageProps) {
           <span>蛋白质 {recipe.protein}g</span>
           <span>{recipe.cookTimeMin} 分钟</span>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {recipe.videoUrl && (
-            <a
-              href={recipe.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-full text-sm border"
-              style={{ borderColor: "var(--color-border)" }}
+
+        {/* External link card — always renders, 2-state */}
+        <a
+          href={videoHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={
+            hasRealVideo
+              ? `打开 B 站视频 ${recipe.name}`
+              : `在哔哩哔哩搜索 ${recipe.name}`
+          }
+          className="rounded-xl p-4 flex items-center gap-3"
+          style={{
+            border: hasRealVideo
+              ? "1px solid var(--color-primary)"
+              : "1px dashed var(--color-border)",
+            backgroundColor: "white",
+          }}
+        >
+          <span className="text-2xl">🎥</span>
+          <div className="flex-1">
+            <div
+              className="font-medium"
+              style={{
+                color: hasRealVideo
+                  ? "var(--color-text-primary)"
+                  : "var(--color-text-tertiary)",
+              }}
             >
-              🎥 看视频版
-            </a>
-          )}
-        </div>
+              {hasRealVideo ? "看视频版" : `在 B 站搜「${recipe.name}」`}
+            </div>
+            <div
+              className="text-xs mt-0.5"
+              style={{ color: "var(--color-text-tertiary)" }}
+            >
+              {hasRealVideo ? "B 站 · 看视频教学" : "点击跳转 B 站搜索 →"}
+            </div>
+          </div>
+          <span style={{ color: "var(--color-text-tertiary)" }}>↗</span>
+        </a>
       </section>
 
+      {/* Ingredients section — split into fridge / pantry */}
       <section
-        className="px-4 py-4 border-t"
+        className="px-4 py-4 border-t flex flex-col gap-4"
         style={{ borderColor: "var(--color-border)" }}
       >
-        <h2 className="font-medium mb-3">所需食材</h2>
-        <ul className="flex flex-col gap-2">
-          {recipe.ingredients.map((ref) => {
-            const ing = INGREDIENT_BY_ID.get(ref.id);
-            const has = selectedSet.has(ref.id);
-            return (
-              <li
-                key={ref.id}
-                className="flex items-center justify-between text-sm"
-              >
-                <span className="flex items-center gap-2">
-                  <span
-                    style={{
-                      color: has
-                        ? "var(--color-success)"
-                        : "var(--color-text-tertiary)",
-                    }}
+        <div>
+          <h2 className="font-medium mb-3 flex items-center gap-1">
+            <span>🧊</span>
+            <span>冰箱食材</span>
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {fridgeIngredients.map((ref) => {
+              const ing = INGREDIENT_BY_ID.get(ref.id);
+              const has = selectedSet.has(ref.id);
+              return (
+                <li
+                  key={ref.id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      style={{
+                        color: has
+                          ? "var(--color-success)"
+                          : "var(--color-text-tertiary)",
+                      }}
+                    >
+                      {has ? "✓" : "✗"}
+                    </span>
+                    <span>
+                      {ing?.emoji} {ing?.name}
+                    </span>
+                  </span>
+                  <span style={{ color: "var(--color-text-tertiary)" }}>
+                    {ref.amount}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {pantryIngredients.length > 0 && (
+          <div>
+            <h2 className="font-medium mb-3 flex items-center gap-1">
+              <span>🥢</span>
+              <span>你需要准备</span>
+            </h2>
+            <ul className="flex flex-col gap-2">
+              {pantryIngredients.map((ref) => {
+                const ing = INGREDIENT_BY_ID.get(ref.id);
+                return (
+                  <li
+                    key={ref.id}
+                    className="flex items-center justify-between text-sm"
+                    style={{ color: "var(--color-text-tertiary)" }}
                   >
-                    {has ? "✓" : "✗"}
-                  </span>
-                  <span>
-                    {ing?.emoji} {ing?.name}
-                  </span>
-                </span>
-                <span style={{ color: "var(--color-text-tertiary)" }}>
-                  {ref.amount}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+                    <span className="flex items-center gap-2">
+                      <span>·</span>
+                      <span>
+                        {ing?.emoji} {ing?.name}
+                      </span>
+                    </span>
+                    <span>{ref.amount}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section
