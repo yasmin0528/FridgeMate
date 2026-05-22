@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ChangeEvent, DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useFridgeStore } from "@/store/fridgeStore";
 import { MOCK_INGREDIENTS } from "@/mock/ingredients";
@@ -329,186 +330,153 @@ export default function UploadPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fafaf9] text-[#1a1a1a]">
-      <nav className="border-b border-[#e5e3df] bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <div className="flex items-center gap-3">
-            <div className="grid size-9 place-items-center rounded-lg bg-[#0a1530] text-sm font-semibold text-white">
-              FM
-            </div>
-            <div>
-              <p className="text-base font-semibold leading-5">FridgeMate</p>
-              <p className="text-xs text-[#787671]">{copy.appSubtitle}</p>
-            </div>
-          </div>
-          <div className="hidden items-center gap-2 text-sm text-[#5d5b54] md:flex">
-            <span>{copy.navInventory}</span>
-            <span className="rounded-full bg-black px-3 py-1.5 text-white">
-              {copy.navUpload}
-            </span>
-            <span>{copy.navRecipes}</span>
-            <span>{copy.navProfile}</span>
-          </div>
-        </div>
-      </nav>
+    <main className="min-h-screen bg-[#fafaf9] text-[#1a1a1a] pb-20">
+      {/* Mobile header (\u4e0e BottomTab \u914d\u5957, \u4e0d\u518d\u4f7f\u7528\u684c\u9762\u9876\u90e8\u5bfc\u822a) */}
+      <header className="px-4 py-3 border-b border-[#e5e3df] bg-white flex items-center gap-2">
+        <Link href="/" className="text-xl" aria-label="\u8fd4\u56de\u9996\u9875">\u2190</Link>
+        <h1 className="text-base font-semibold">\u62cd\u7167\u4e0a\u4f20</h1>
+      </header>
 
-      <section className="bg-[#0a1530] text-white">
-        <div className="relative mx-auto grid max-w-7xl gap-10 overflow-hidden px-5 py-12 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:py-16">
-          <div className="absolute left-[8%] top-10 size-4 rounded bg-[#f5d75e]" />
-          <div className="absolute right-[18%] top-16 size-3 rounded bg-[#ff64c8]" />
-          <div className="absolute bottom-16 left-[42%] size-3 rounded bg-[#2a9d99]" />
-
-          <div className="relative z-10 flex flex-col justify-center">
-            <p className="mb-4 text-sm font-semibold text-[#d6b6f6]">
-              {copy.pageKicker}
-            </p>
-            <h1 className="max-w-xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-              {copy.heroTitle}
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-[#d7d2ca] sm:text-lg">
-              {copy.heroDesc}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button
-                className="h-11 rounded-lg bg-[#5645d4] px-5 text-sm font-medium text-white"
-                onClick={() => cameraInputRef.current?.click()}
-                type="button"
-              >
-                {copy.camera}
-              </button>
-              <button
-                className="h-11 rounded-lg border border-[#a4a097] px-5 text-sm font-medium text-white"
-                onClick={() => albumInputRef.current?.click()}
-                type="button"
-              >
-                {copy.album}
-              </button>
-            </div>
-          </div>
-
-          <div className="relative z-10 rounded-xl border border-[#e5e3df] bg-white p-3 text-[#1a1a1a] shadow-[rgba(15,15,15,0.2)_0px_24px_48px_-8px]">
-            <div className="flex items-center justify-between border-b border-[#ede9e4] px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span className="size-3 rounded-full bg-[#e03131]" />
-                <span className="size-3 rounded-full bg-[#f5d75e]" />
-                <span className="size-3 rounded-full bg-[#1aae39]" />
-              </div>
-              <span className="text-xs font-medium text-[#787671]">
-                {copy.previewTitle}
-              </span>
-            </div>
-            <div className="grid gap-4 p-3 md:grid-cols-[1.1fr_0.9fr]">
-              <div
-                className={`grid min-h-72 place-items-center rounded-lg border border-dashed bg-[#f6f5f4] transition ${isDragging ? "border-[#5645d4] ring-4 ring-[#e6e0f5]" : "border-[#c8c4be]"}`}
-                onDragLeave={() => setIsDragging(false)}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDrop={handleDrop}
-              >
-                {previewUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    alt="\u4e0a\u4f20\u7684\u51b0\u7bb1\u56fe\u7247\u9884\u89c8"
-                    className="h-full max-h-80 w-full rounded-lg object-cover"
-                    src={previewUrl}
-                  />
-                ) : (
-                  <div className="px-8 text-center">
-                    <div className="mx-auto mb-4 grid size-14 place-items-center rounded-xl bg-[#e6e0f5] text-2xl text-[#391c57]">
-                      +
-                    </div>
-                    <p className="text-sm font-medium text-[#37352f]">
-                      {copy.emptyUpload}
-                    </p>
-                    <p className="mt-2 text-sm text-[#787671]">
-                      {copy.uploadHint}
-                    </p>
-                    <p className="mt-1 text-xs text-[#a4a097]">
-                      {copy.dragHint}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <aside className="rounded-lg bg-[#f9e79f] p-5">
-                <p className="text-sm font-semibold text-[#523410]">
-                  {copy.currentStatus}
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold text-[#37352f]">
-                  {getStageLabel(stage)}
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-[#523410]">
-                  {stage === "recognizing"
-                    ? copy.recognizingDesc
-                    : stage === "synced"
-                      ? copy.syncedDesc
-                      : copy.idleDesc}
-                </p>
-                <div className="mt-6 rounded-lg bg-white/70 p-4">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span>{copy.progress}</span>
-                    <span>{progress}%</span>
-                  </div>
-                  <div className="mt-3 h-2 rounded-full bg-white">
-                    <div
-                      className="h-2 rounded-full bg-[#5645d4] transition-all duration-500"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-              </aside>
-            </div>
-          </div>
+      {/* Hero: navy \u80cc\u666f + \u6807\u9898 + \u884c\u52a8\u6309\u94ae */}
+      <section className="bg-[#0a1530] text-white px-4 py-5">
+        <p className="text-xs font-semibold text-[#d6b6f6]">
+          {copy.pageKicker}
+        </p>
+        <h2 className="mt-2 text-xl font-semibold leading-snug">
+          {copy.heroTitle}
+        </h2>
+        <p className="mt-2 text-xs leading-5 text-[#d7d2ca]">
+          {copy.heroDesc}
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            className="h-11 rounded-lg bg-[#5645d4] text-sm font-medium text-white"
+            onClick={() => cameraInputRef.current?.click()}
+            type="button"
+          >
+            {copy.camera}
+          </button>
+          <button
+            className="h-11 rounded-lg border border-[#a4a097] text-sm font-medium text-white"
+            onClick={() => albumInputRef.current?.click()}
+            type="button"
+          >
+            {copy.album}
+          </button>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[300px_1fr] lg:py-10">
-        <aside className="space-y-4">
-          <div className="rounded-xl border border-[#e5e3df] bg-white p-6">
-            <p className="text-sm font-semibold text-[#787671]">{copy.file}</p>
-            <p className="mt-2 break-all text-base font-medium">
-              {fileName || copy.noFile}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-[#dcecfa] p-5">
-              <p className="text-sm text-[#5d5b54]">{copy.detected}</p>
-              <p className="mt-2 text-3xl font-semibold">{detectedCount}</p>
+      {/* \u9884\u89c8 + \u5f53\u524d\u72b6\u6001 (\u5355\u5217\u5782\u76f4\u5806\u53e0) */}
+      <section className="px-4 py-4 flex flex-col gap-3">
+        <div
+          className={`rounded-xl border border-dashed bg-white transition ${isDragging ? "border-[#5645d4] ring-2 ring-[#e6e0f5]" : "border-[#c8c4be]"}`}
+          onDragLeave={() => setIsDragging(false)}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setIsDragging(true);
+          }}
+          onDrop={handleDrop}
+        >
+          {previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              alt="\u4e0a\u4f20\u7684\u51b0\u7bb1\u56fe\u7247\u9884\u89c8"
+              className="w-full rounded-xl object-cover max-h-64"
+              src={previewUrl}
+            />
+          ) : (
+            <div className="px-6 py-10 text-center">
+              <div className="mx-auto mb-3 grid size-12 place-items-center rounded-xl bg-[#e6e0f5] text-2xl text-[#391c57]">
+                +
+              </div>
+              <p className="text-sm font-medium text-[#37352f]">
+                {copy.emptyUpload}
+              </p>
+              <p className="mt-1 text-xs text-[#787671]">{copy.uploadHint}</p>
+              <p className="mt-1 text-xs text-[#a4a097]">{copy.dragHint}</p>
             </div>
-            <div className="rounded-xl bg-[#d9f3e1] p-5">
-              <p className="text-sm text-[#5d5b54]">{copy.freshCount}</p>
-              <p className="mt-2 text-3xl font-semibold">{freshCount}</p>
-            </div>
-          </div>
-          <div className="rounded-xl border border-[#e5e3df] bg-white p-6">
-            <p className="text-sm font-semibold text-[#787671]">{copy.steps}</p>
-            <ol className="mt-4 space-y-3">
-              {recognitionSteps.map((step, index) => (
-                <li className="flex items-center gap-3" key={step}>
-                  <span
-                    className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${index <= activeStep ? "bg-[#5645d4] text-white" : "bg-[#f0eeec] text-[#787671]"}`}
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="text-sm text-[#37352f]">{step}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </aside>
+          )}
+        </div>
 
-        <section className="rounded-xl border border-[#e5e3df] bg-white">
-          <div className="flex flex-col gap-4 border-b border-[#ede9e4] p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[#5645d4]">
+        {/* \u5f53\u524d\u72b6\u6001\u5361 */}
+        <div className="rounded-xl bg-[#f9e79f] p-4">
+          <p className="text-xs font-semibold text-[#523410]">
+            {copy.currentStatus}
+          </p>
+          <h3 className="mt-1 text-lg font-semibold text-[#37352f]">
+            {getStageLabel(stage)}
+          </h3>
+          <p className="mt-2 text-xs leading-5 text-[#523410]">
+            {stage === "recognizing"
+              ? copy.recognizingDesc
+              : stage === "synced"
+                ? copy.syncedDesc
+                : copy.idleDesc}
+          </p>
+          <div className="mt-3 rounded-lg bg-white/70 p-3">
+            <div className="flex justify-between text-xs font-medium">
+              <span>{copy.progress}</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="mt-2 h-2 rounded-full bg-white">
+              <div
+                className="h-2 rounded-full bg-[#5645d4] transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* \u6587\u4ef6\u540d + \u7edf\u8ba1 chip */}
+        <div className="rounded-xl bg-white border border-[#e5e3df] p-3">
+          <p className="text-xs font-semibold text-[#787671]">{copy.file}</p>
+          <p className="mt-1 break-all text-sm font-medium">
+            {fileName || copy.noFile}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl bg-[#dcecfa] p-3">
+            <p className="text-xs text-[#5d5b54]">{copy.detected}</p>
+            <p className="mt-1 text-2xl font-semibold">{detectedCount}</p>
+          </div>
+          <div className="rounded-xl bg-[#d9f3e1] p-3">
+            <p className="text-xs text-[#5d5b54]">{copy.freshCount}</p>
+            <p className="mt-1 text-2xl font-semibold">{freshCount}</p>
+          </div>
+        </div>
+
+        {/* \u6b65\u9aa4\u6307\u793a\u5668 */}
+        <div className="rounded-xl bg-white border border-[#e5e3df] p-4">
+          <p className="text-xs font-semibold text-[#787671]">{copy.steps}</p>
+          <ol className="mt-3 space-y-2">
+            {recognitionSteps.map((step, index) => (
+              <li className="flex items-center gap-3" key={step}>
+                <span
+                  className={`grid size-6 place-items-center rounded-full text-xs font-semibold ${index <= activeStep ? "bg-[#5645d4] text-white" : "bg-[#f0eeec] text-[#787671]"}`}
+                >
+                  {index + 1}
+                </span>
+                <span className="text-xs text-[#37352f]">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* \u8bc6\u522b\u7ed3\u679c\u5217\u8868 */}
+      <section className="px-4 pb-6">
+        <div className="rounded-xl border border-[#e5e3df] bg-white">
+          <div className="flex items-center justify-between gap-2 border-b border-[#ede9e4] p-4">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-[#5645d4]">
                 {copy.results}
               </p>
-              <h2 className="mt-1 text-2xl font-semibold">{copy.editTitle}</h2>
+              <h2 className="mt-0.5 text-base font-semibold truncate">
+                {copy.editTitle}
+              </h2>
             </div>
             <button
-              className="h-10 rounded-lg border border-[#c8c4be] px-4 text-sm font-medium text-[#1a1a1a]"
+              className="h-9 shrink-0 rounded-lg border border-[#c8c4be] px-3 text-xs font-medium text-[#1a1a1a]"
               onClick={openInputChoices}
               type="button"
             >
@@ -518,7 +486,7 @@ export default function UploadPage() {
 
           {message ? (
             <div
-              className={`m-5 rounded-lg p-4 text-sm font-medium ${stage === "synced" ? "bg-[#d9f3e1] text-[#1aae39]" : "bg-[#ffe8d4] text-[#793400]"}`}
+              className={`m-3 rounded-lg p-3 text-xs font-medium ${stage === "synced" ? "bg-[#d9f3e1] text-[#1aae39]" : "bg-[#ffe8d4] text-[#793400]"}`}
             >
               {message}
             </div>
@@ -528,15 +496,15 @@ export default function UploadPage() {
             <div className="divide-y divide-[#ede9e4]">
               {ingredients.map((item) => (
                 <article
-                  className="grid gap-3 p-5 md:grid-cols-[1.1fr_0.8fr_0.8fr_0.9fr_auto] md:items-center"
+                  className="grid grid-cols-2 gap-2 p-3"
                   key={item.id}
                 >
-                  <label className="grid gap-1">
+                  <label className="col-span-2 grid gap-1">
                     <span className="text-xs font-medium text-[#787671]">
                       {copy.name}
                     </span>
                     <input
-                      className="h-11 rounded-lg border border-[#c8c4be] px-3 text-sm outline-none focus:border-2 focus:border-[#5645d4]"
+                      className="h-10 rounded-lg border border-[#c8c4be] px-3 text-sm outline-none focus:border-2 focus:border-[#5645d4]"
                       onChange={(event) =>
                         updateIngredient(item.id, "name", event.target.value)
                       }
@@ -548,7 +516,7 @@ export default function UploadPage() {
                       {copy.amount}
                     </span>
                     <input
-                      className="h-11 rounded-lg border border-[#c8c4be] px-3 text-sm outline-none focus:border-2 focus:border-[#5645d4]"
+                      className="h-10 rounded-lg border border-[#c8c4be] px-3 text-sm outline-none focus:border-2 focus:border-[#5645d4]"
                       onChange={(event) =>
                         updateIngredient(item.id, "amount", event.target.value)
                       }
@@ -560,7 +528,7 @@ export default function UploadPage() {
                       {copy.shelfLife}
                     </span>
                     <input
-                      className="h-11 rounded-lg border border-[#c8c4be] px-3 text-sm outline-none focus:border-2 focus:border-[#5645d4]"
+                      className="h-10 rounded-lg border border-[#c8c4be] px-3 text-sm outline-none focus:border-2 focus:border-[#5645d4]"
                       onChange={(event) =>
                         updateIngredient(
                           item.id,
@@ -576,7 +544,7 @@ export default function UploadPage() {
                       {copy.stockStatus}
                     </span>
                     <select
-                      className={`h-11 rounded-lg border border-[#c8c4be] px-3 text-sm font-semibold outline-none focus:border-2 focus:border-[#5645d4] ${statusMeta[item.status].className}`}
+                      className={`h-10 rounded-lg border border-[#c8c4be] px-3 text-sm font-semibold outline-none focus:border-2 focus:border-[#5645d4] ${statusMeta[item.status].className}`}
                       onChange={(event) =>
                         updateIngredient(
                           item.id,
@@ -595,7 +563,7 @@ export default function UploadPage() {
                   </label>
                   <button
                     aria-label={`${copy.delete}${item.name}`}
-                    className="h-11 rounded-lg border border-[#e5e3df] px-4 text-sm font-medium text-[#dd5b00]"
+                    className="h-10 rounded-lg border border-[#e5e3df] text-xs font-medium text-[#dd5b00]"
                     onClick={() => deleteIngredient(item.id)}
                     type="button"
                   >
@@ -605,48 +573,46 @@ export default function UploadPage() {
               ))}
             </div>
           ) : (
-            <div className="grid min-h-64 place-items-center px-6 text-center">
-              <div>
-                <p className="text-base font-medium text-[#37352f]">
-                  {copy.emptyResults}
-                </p>
-                <button
-                  className="mt-5 h-10 rounded-lg bg-[#5645d4] px-4 text-sm font-medium text-white"
-                  onClick={openInputChoices}
-                  type="button"
-                >
-                  {copy.addFromEmpty}
-                </button>
-              </div>
+            <div className="px-6 py-10 text-center">
+              <p className="text-sm font-medium text-[#37352f]">
+                {copy.emptyResults}
+              </p>
+              <button
+                className="mt-4 h-10 rounded-lg bg-[#5645d4] px-4 text-sm font-medium text-white"
+                onClick={openInputChoices}
+                type="button"
+              >
+                {copy.addFromEmpty}
+              </button>
             </div>
           )}
 
           {isChoosingInput ? (
-            <div className="border-t border-[#ede9e4] bg-[#f6f5f4] p-5">
-              <div className="rounded-xl border border-[#e5e3df] bg-white p-5">
-                <p className="text-sm font-semibold text-[#5645d4]">
+            <div className="border-t border-[#ede9e4] bg-[#f6f5f4] p-3">
+              <div className="rounded-xl border border-[#e5e3df] bg-white p-3">
+                <p className="text-xs font-semibold text-[#5645d4]">
                   {copy.chooseInput}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-[#5d5b54]">
+                <p className="mt-1 text-xs leading-5 text-[#5d5b54]">
                   {copy.chooseInputDesc}
                 </p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="mt-3 grid grid-cols-3 gap-2">
                   <button
-                    className="h-11 rounded-lg bg-[#5645d4] px-4 text-sm font-medium text-white"
+                    className="h-10 rounded-lg bg-[#5645d4] text-xs font-medium text-white"
                     onClick={() => cameraInputRef.current?.click()}
                     type="button"
                   >
                     {copy.camera}
                   </button>
                   <button
-                    className="h-11 rounded-lg border border-[#c8c4be] px-4 text-sm font-medium"
+                    className="h-10 rounded-lg border border-[#c8c4be] text-xs font-medium"
                     onClick={() => albumInputRef.current?.click()}
                     type="button"
                   >
                     {copy.album}
                   </button>
                   <button
-                    className="h-11 rounded-lg border border-[#c8c4be] px-4 text-sm font-medium"
+                    className="h-10 rounded-lg border border-[#c8c4be] text-xs font-medium"
                     onClick={addIngredientManually}
                     type="button"
                   >
@@ -657,9 +623,10 @@ export default function UploadPage() {
             </div>
           ) : null}
 
-          <div className="flex flex-col gap-3 border-t border-[#ede9e4] p-5 sm:flex-row sm:justify-end">
+          {/* \u5e95\u90e8\u64cd\u4f5c\u6309\u94ae (sticky-style \u6a2a\u6392, \u63a7\u5236\u5728 414px \u5185) */}
+          <div className="grid grid-cols-3 gap-2 border-t border-[#ede9e4] p-3">
             <button
-              className="h-11 rounded-lg border border-[#c8c4be] px-5 text-sm font-medium"
+              className="h-10 rounded-lg border border-[#c8c4be] text-xs font-medium disabled:opacity-40"
               disabled={!previewUrl || stage === "recognizing"}
               onClick={() => startRecognition()}
               type="button"
@@ -667,14 +634,14 @@ export default function UploadPage() {
               {copy.retry}
             </button>
             <button
-              className="h-11 rounded-lg border border-[#c8c4be] px-5 text-sm font-medium"
+              className="h-10 rounded-lg border border-[#c8c4be] text-xs font-medium"
               onClick={resetPage}
               type="button"
             >
               {copy.reset}
             </button>
             <button
-              className="h-11 rounded-lg bg-[#5645d4] px-5 text-sm font-medium text-white disabled:bg-[#e5e3df] disabled:text-[#bbb8b1]"
+              className="h-10 rounded-lg bg-[#5645d4] text-xs font-medium text-white disabled:bg-[#e5e3df] disabled:text-[#bbb8b1]"
               disabled={ingredients.length === 0 || stage === "recognizing"}
               onClick={confirmSync}
               type="button"
@@ -682,7 +649,7 @@ export default function UploadPage() {
               {copy.confirm}
             </button>
           </div>
-        </section>
+        </div>
       </section>
 
       <input

@@ -33,6 +33,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## 项目特有规则
 
 - 项目路径含中文字符，Next.js 默认 Turbopack 会触发 UTF-8 字节边界 panic。`dev` 脚本固定用 `--webpack`，请勿改回。
+- **Mobile-first 视觉策略**：作业要求"单手机端 App"（HCI 第 7 章 · 移动界面设计）。所有页面以 414px (iPhone 12 Pro) 宽度为基准设计：
+  - **禁止**用 `max-w-7xl` / `max-w-6xl` 等桌面容器宽度
+  - **禁止**用 `lg:` / `md:grid-cols-N` 切换桌面多列布局；改用单列堆叠
+  - 文案与字号按手机端比例（标题 ~`text-xl`，正文 ~`text-sm`），不要 `text-5xl` / `text-6xl`
+  - `globals.css` 已在 `@media (min-width: 768px)` 强制把 body 限定 414px 居中显示；新页面只要不破坏这套约束即可
 - Mock 数据扩缩容时同步跑 `npm test` 确认 `src/mock/mock.test.ts` 的完整性检查通过（食材总数、类别分布、菜谱字段、外链 URL 格式、无孤立食材）。
 - 修改 `src/store/` 下的 reducer 时，跑 `npm test` 确认 reducer 不可变性契约（[fridgeStore.test.ts](src/store/fridgeStore.test.ts) / [checkinStore.test.ts](src/store/checkinStore.test.ts)）。
 - localStorage 数据 schema 变了，bump [src/store/fridgeStore.tsx](src/store/fridgeStore.tsx) 顶部的 `STORAGE_VERSION` 常量；老缓存自动作废。
