@@ -1,65 +1,113 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useFridgeStore } from "@/store/fridgeStore";
+import { useCheckinStore } from "@/store/checkinStore";
+import { IngredientChip } from "@/components/IngredientChip";
+import { INGREDIENT_BY_ID } from "@/mock/ingredients";
+import type { IngredientCategory } from "@/types";
+
+const CATEGORY_ORDER: { key: IngredientCategory; label: string; emoji: string }[] = [
+  { key: "protein", label: "蛋白", emoji: "🥩" },
+  { key: "veg", label: "蔬菜", emoji: "🥬" },
+  { key: "aromatic", label: "调味小菜", emoji: "🧄" },
+  { key: "seasoning", label: "调味料", emoji: "🧂" },
+  { key: "dairy", label: "乳制", emoji: "🥛" },
+  { key: "fruit", label: "水果", emoji: "🍎" },
+];
+
+export default function HomePage() {
+  const { inventory, selectedIds, toggleSelect } = useFridgeStore();
+  const { streak } = useCheckinStore();
+
+  // Group inventory items by category
+  const byCategory = new Map<IngredientCategory, typeof inventory>();
+  for (const item of inventory) {
+    const ing = INGREDIENT_BY_ID.get(item.ingredientId);
+    if (!ing) continue;
+    const list = byCategory.get(ing.category) ?? [];
+    list.push(item);
+    byCategory.set(ing.category, list);
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="px-4 py-6 flex flex-col gap-6">
+      <header>
+        <h1 className="text-2xl font-semibold">今日</h1>
+        <p
+          className="text-sm"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          🔥 连续 {streak} 天
+        </p>
+      </header>
+
+      {CATEGORY_ORDER.map(({ key, label, emoji }) => {
+        const items = byCategory.get(key);
+        if (!items || items.length === 0) return null;
+        return (
+          <section key={key} className="rounded-2xl bg-white p-4">
+            <div
+              className="text-sm mb-3 flex items-center gap-1"
+              style={{ color: "var(--color-text-secondary)" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+              <span>{emoji}</span>
+              <span>{label}</span>
+              <span className="text-xs opacity-60">· {items.length}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {items.map((it) => {
+                const ing = INGREDIENT_BY_ID.get(it.ingredientId);
+                const selected = selectedIds.includes(it.ingredientId);
+                return (
+                  <button
+                    key={it.ingredientId}
+                    onClick={() => toggleSelect(it.ingredientId)}
+                    className="rounded-xl p-3 border flex flex-col items-center gap-1"
+                    style={{
+                      borderColor: selected
+                        ? "var(--color-primary)"
+                        : "var(--color-border)",
+                      backgroundColor: selected
+                        ? "var(--color-primary-light)"
+                        : "white",
+                    }}
+                  >
+                    <span className="text-2xl">{ing?.emoji}</span>
+                    <span className="text-sm">{ing?.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
+
+      {selectedIds.length > 0 && (
+        <section
+          className="sticky bottom-20 z-10 rounded-2xl bg-white p-4 flex flex-col gap-3 shadow-lg border"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <div
+            className="text-sm"
+            style={{ color: "var(--color-text-secondary)" }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            已选 {selectedIds.length} 种
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {selectedIds.map((id) => (
+              <IngredientChip key={id} ingredientId={id} />
+            ))}
+          </div>
+          <Link
+            href="/recipes"
+            className="block text-center py-3 rounded-full text-white"
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            查看推荐菜谱 →
+          </Link>
+        </section>
+      )}
+    </main>
   );
 }
