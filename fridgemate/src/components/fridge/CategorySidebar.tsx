@@ -24,50 +24,48 @@ export function CategorySidebar({
   const options = mode === "zone" ? zones : categories;
 
   return (
-    <div className={`${className} bg-white rounded-3xl border border-slate-200 shadow-sm p-4`}>
-      <div className="flex items-center justify-between gap-2 mb-4">
-        <div>
-          <p className="text-sm font-semibold text-slate-900">分类方式</p>
-          <p className="text-xs text-slate-500">选择显示规则</p>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-4">
+    <div className={`${className} bg-white rounded-[12px] border border-[#e5e3df] p-[24px]`}>
+      {/* Pill-tab mode switcher */}
+      <div className="flex gap-2 mb-4">
         <button
           type="button"
           onClick={() => onModeChange("zone")}
-          className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             mode === "zone"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              ? "bg-[#1a1a1a] text-white"
+              : "border border-[#e5e3df] text-[#787671] bg-transparent"
           }`}
+          style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
         >
           存储分类
         </button>
         <button
           type="button"
           onClick={() => onModeChange("category")}
-          className={`rounded-full px-3 py-2 text-sm font-medium transition ${
+          className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             mode === "category"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              ? "bg-[#1a1a1a] text-white"
+              : "border border-[#e5e3df] text-[#787671] bg-transparent"
           }`}
+          style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
         >
           食材种类
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 md:grid-cols-1">
+      {/* Option grid: 3-col on mobile, 1-col on sidebar */}
+      <div className="grid grid-cols-3 md:grid-cols-1 gap-2">
         {options.map((option) => (
           <button
             key={option.key}
             type="button"
             onClick={() => onSelectKey(option.key)}
-            className={`rounded-3xl px-3 py-3 text-sm text-left transition-all border ${
+            className={`rounded-[8px] px-3 py-2.5 text-sm text-left transition-all border ${
               selectedKey === option.key
-                ? "border-slate-900 bg-slate-900 text-white"
-                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                ? "border-[#1a1a1a] bg-[#1a1a1a] text-white"
+                : "border-[#e5e3df] bg-white text-[#5d5b54]"
             }`}
+            style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
           >
             {option.label}
           </button>

@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FridgeGrid, TaskBar, TopBar, SelectedFridgeBar } from "@/components/fridge";
-import { BottomTab } from "@/components/BottomTab";
 import { CategorySidebar, FilterMode } from "@/components/fridge/CategorySidebar";
 import { SelectionOverlay } from "@/components/fridge/SelectionOverlay";
 import { FOODS_DATA } from "@/data/foods";
@@ -29,7 +27,6 @@ const CATEGORY_OPTIONS = [
 ];
 
 export default function FridgePage() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [foods, setFoods] = useState<Food[]>([]);
   const [filterMode, setFilterMode] = useState<FilterMode>("zone");
@@ -48,10 +45,6 @@ export default function FridgePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleRecommend = useCallback(() => {
-    router.push("/recipes");
-  }, [router]);
-
   const handleFoodClick = useCallback((food: Food) => {
     setOverlayFood(food);
     setOverlayOpen(true);
@@ -60,12 +53,10 @@ export default function FridgePage() {
   const { toggleSelect, selectedSet } = useFridgeStore();
 
   const handleSelectFood = useCallback((food: Food) => {
-    // Try to map Food (from FOODS_DATA) to a mock ingredient id by name
     const match = Array.from(INGREDIENT_BY_ID.values()).find((ing) => ing.name === food.name);
     if (match) {
       toggleSelect(match.id);
     } else {
-      // fallback to numeric id string if no ingredient mapping
       toggleSelect(String(food.id));
     }
     setSelectedBarOpen(true);
@@ -93,46 +84,31 @@ export default function FridgePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
+      <div className="min-h-screen bg-[#f6f5f4]">
+        <div className="bg-white border-b border-[#e5e3df]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                <div className="w-10 h-10 rounded-[8px] bg-[#e5e3df] animate-pulse"></div>
                 <div className="space-y-2">
-                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-3 w-40 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-20 bg-[#e5e3df] rounded-[6px] animate-pulse"></div>
+                  <div className="h-3 w-40 bg-[#e5e3df] rounded-[6px] animate-pulse"></div>
                 </div>
               </div>
               <div className="flex gap-2">
-                <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div className="w-10 h-10 bg-[#e5e3df] rounded-[8px] animate-pulse"></div>
+                <div className="w-10 h-10 bg-[#e5e3df] rounded-[8px] animate-pulse"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
-          <div className="space-y-4 mb-8">
-            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-square bg-gray-200 rounded-lg animate-pulse"
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-square bg-gray-200 rounded-lg animate-pulse"
-                ></div>
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 space-y-6">
+          <div className="space-y-3">
+            <div className="h-5 w-24 bg-[#e5e3df] rounded-[6px] animate-pulse"></div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="aspect-square bg-[#e5e3df] rounded-[12px] animate-pulse"></div>
               ))}
             </div>
           </div>
@@ -142,12 +118,15 @@ export default function FridgePage() {
   }
 
   return (
-    <motion.main className="min-h-screen bg-slate-50 text-slate-900">
+    <motion.main className="min-h-screen bg-[#f6f5f4]">
       <TopBar />
 
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 md:px-6 md:py-6">
-        <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-          <aside className="hidden xl:block">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-5 md:py-6">
+        {/* Mobile: stacked layout. Tablet/Desktop: sidebar + content side by side */}
+        <div className="flex flex-col gap-5 md:flex-row md:gap-6">
+
+          {/* Sidebar — full width on mobile, 240px fixed on md+ */}
+          <aside className="w-full md:w-56 lg:w-64 shrink-0">
             <CategorySidebar
               mode={filterMode}
               selectedKey={selectedFilter}
@@ -161,85 +140,31 @@ export default function FridgePage() {
             />
           </aside>
 
-          <section className="space-y-6">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-lg font-semibold text-slate-900">冰箱库存总览</p>
-                  <p className="mt-2 max-w-xl text-sm text-slate-600">
-                    通过侧边栏快速切换存储分类或食材种类，直观查看当前库存与已选食材。
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center rounded-3xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
-                  onClick={handleRecommend}
-                >
-                  推荐食谱
-                </button>
-              </div>
-            </div>
-
-            <div className="xl:hidden">
-              <CategorySidebar
-                mode={filterMode}
-                selectedKey={selectedFilter}
-                onModeChange={(value) => {
-                  setFilterMode(value);
-                  setSelectedFilter("all");
-                }}
-                onSelectKey={setSelectedFilter}
-                categories={CATEGORY_OPTIONS}
-                zones={STORAGE_OPTIONS}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div className="rounded-[32px] border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">当前筛选</p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      {filterMode === "zone"
-                        ? `存储分类：${STORAGE_OPTIONS.find((item) => item.key === selectedFilter)?.label ?? "全部"}`
-                        : `食材分类：${CATEGORY_OPTIONS.find((item) => item.key === selectedFilter)?.label ?? "全部"}`}
-                    </p>
-                  </div>
-                  <p className="text-sm text-slate-500">共 {filteredFoods.length} 件可用食材</p>
-                </div>
-              </div>
-
-              <div className="grid gap-4 rounded-[32px] border border-slate-200 bg-white p-4 shadow-sm">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`${filterMode}-${selectedFilter}`}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{ duration: 0.24 }}
-                  >
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                      <FridgeGrid
-                        foods={filteredFoods}
-                        onFoodClick={handleFoodClick}
-                        onSelect={handleSelectFood}
-                        onEdit={handleEditFood}
-                        onDelete={handleRemoveFood}
-                      />
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
-
-            <TaskBar />
+          {/* Main content area */}
+          <section className="flex-1 min-w-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${filterMode}-${selectedFilter}`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.2 }}
+              >
+                <FridgeGrid
+                  foods={filteredFoods}
+                  onFoodClick={handleFoodClick}
+                  onSelect={handleSelectFood}
+                  onEdit={handleEditFood}
+                  onDelete={handleRemoveFood}
+                />
+              </motion.div>
+            </AnimatePresence>
           </section>
         </div>
       </div>
 
       <SelectionOverlay food={overlayFood} open={overlayOpen} onClose={() => setOverlayOpen(false)} />
       <SelectedFridgeBar open={selectedBarOpen} onClose={() => setSelectedBarOpen(false)} />
-      <BottomTab />
     </motion.main>
   );
 }

@@ -18,10 +18,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body className="pb-20">
+      <body>
         <Providers>
-          {children}
-          <BottomTab />
+          <div className="flex min-h-screen flex-col pb-[60px] md:pb-0">
+            <div className="flex-1">
+              {children}
+            </div>
+            <BottomTab />
+          </div>
         </Providers>
       </body>
     </html>

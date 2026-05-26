@@ -330,7 +330,7 @@ export default function UploadPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fafaf9] text-[#1a1a1a] pb-20">
+    <main className="min-h-screen bg-[#fafaf9] text-[#1a1a1a]">
       {/* Mobile header (\u4e0e BottomTab \u914d\u5957, \u4e0d\u518d\u4f7f\u7528\u684c\u9762\u9876\u90e8\u5bfc\u822a) */}
       <header className="px-4 py-3 border-b border-[#e5e3df] bg-white flex items-center gap-2">
         <Link href="/" className="text-xl" aria-label={"\u8fd4\u56de\u9996\u9875"}>{"\u2190"}</Link>

@@ -93,12 +93,13 @@ export const FoodCard = React.memo(function FoodCard({
 
   return (
     <motion.article
-      className="h-full rounded-[28px] border border-slate-200 bg-white shadow-sm"
+      className="h-full rounded-[12px] border border-[#e5e3df] bg-white"
+      style={{ boxShadow: isSelected ? "rgba(15, 15, 15, 0.08) 0px 4px 12px 0px" : "rgba(15, 15, 15, 0.04) 0px 1px 2px 0px" }}
       whileHover={!isMobile ? { y: -2 } : undefined}
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
     >
       <div
-        className="relative h-full w-full cursor-pointer overflow-hidden rounded-[28px]"
+        className="relative h-full w-full cursor-pointer overflow-hidden rounded-[12px]"
         onClick={handleFlip}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -111,10 +112,10 @@ export const FoodCard = React.memo(function FoodCard({
             transition={{ duration: 0.45, ease: "easeOut" }}
             style={{ transformStyle: "preserve-3d" }}
           >
-            {/* 正面 */}
+            {/* Front face */}
             <div
-              className={`absolute inset-0 flex flex-col justify-between rounded-[28px] border border-slate-200 bg-white transition-all ${
-                isSelected ? "shadow-lg" : "shadow-sm"
+              className={`absolute inset-0 flex flex-col justify-between rounded-[12px] border border-[#e5e3df] bg-white ${
+                isSelected ? "ring-2 ring-[#5645d4]" : ""
               }`}
               style={{ backfaceVisibility: "hidden" } as React.CSSProperties}
             >
@@ -128,69 +129,123 @@ export const FoodCard = React.memo(function FoodCard({
                     handleSelect(e as any);
                   }}
                   aria-pressed={isSelected}
-                  className={`absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-sm border ${
-                    isSelected ? "bg-slate-900 border-slate-900" : "bg-white border-slate-300"
+                  className={`absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-[6px] border ${
+                    isSelected ? "bg-[#5645d4] border-[#5645d4]" : "bg-white border-[#c8c4be]"
                   }`}
                 >
                   {isSelected ? (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17L4 12" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   ) : null}
                 </button>
 
                 <div className="absolute left-3 bottom-3">
-                  <div className="text-sm font-medium text-slate-900">{food.name}</div>
-                  <div className="text-xs text-slate-600">{food.count} 份</div>
+                  <div
+                    className="text-sm font-medium text-[#1a1a1a]"
+                    style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
+                  >
+                    {food.name}
+                  </div>
+                  <div
+                    className="text-xs text-[#787671]"
+                    style={{ fontSize: "13px", lineHeight: 1.4 }}
+                  >
+                    {food.count} 份
+                  </div>
                 </div>
 
-                <div className="absolute right-3 bottom-3 text-lg font-bold text-slate-800">{food.expire}</div>
+                <div
+                  className="absolute right-3 bottom-3 text-sm font-bold text-[#37352f]"
+                  style={{ fontSize: "14px", fontWeight: 600, lineHeight: 1.4 }}
+                >
+                  {food.expire}
+                </div>
               </div>
             </div>
 
-            {/* 背面 */}
+            {/* Back face */}
             <div
-              className="absolute inset-0 flex flex-col justify-between rounded-[28px] border border-slate-200 bg-slate-50"
+              className="absolute inset-0 flex flex-col justify-between rounded-[12px] border border-[#e5e3df] bg-[#f6f5f4]"
               style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" } as React.CSSProperties}
             >
-              {/* 上半部分：详情文本 */}
-              <div className="p-5 flex-1">
+              {/* Detail area */}
+              <div className="p-[20px] flex-1">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">食材详情</p>
+                  <p
+                    className="text-xs font-semibold uppercase text-[#787671]"
+                    style={{ fontSize: "11px", fontWeight: 600, lineHeight: 1.4, letterSpacing: "1px" }}
+                  >
+                    食材详情
+                  </p>
                   <div className="mt-4 flex items-center gap-3">
-                    <p className="text-lg font-semibold text-slate-900">{food.name}</p>
-                    <span className="text-sm text-slate-500 capitalize">{food.category}</span>
+                    <p
+                      className="text-base font-semibold text-[#1a1a1a]"
+                      style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3 }}
+                    >
+                      {food.name}
+                    </p>
+                    <span
+                      className="text-sm text-[#5d5b54] capitalize"
+                      style={{ fontSize: "14px", lineHeight: 1.5 }}
+                    >
+                      {food.category}
+                    </span>
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">{food.expire}</p>
+                  <p
+                    className="mt-2 text-sm text-[#787671]"
+                    style={{ fontSize: "14px", lineHeight: 1.5 }}
+                  >
+                    {food.expire}
+                  </p>
                 </div>
               </div>
 
-              {/* 下半部分：操作按钮栏 */}
+              {/* Action buttons */}
               <div className="w-full flex h-14 overflow-hidden">
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setShowEditModal(true); }}
-                  className="flex-1 h-full rounded-bl-[28px] bg-lime-600 px-4 text-sm font-semibold text-white hover:brightness-95 flex items-center justify-center"
+                  className="flex-1 h-full rounded-bl-[12px] text-sm font-semibold text-white flex items-center justify-center"
+                  style={{ backgroundColor: "#5645d4", fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
                 >
                   编辑
                 </button>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
-                  className="flex-1 h-full rounded-br-[28px] bg-rose-600 px-4 text-sm font-semibold text-white hover:brightness-95 flex items-center justify-center"
+                  className="flex-1 h-full rounded-br-[12px] text-sm font-semibold text-white flex items-center justify-center"
+                  style={{ backgroundColor: "#e03131", fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
                 >
                   删除
                 </button>
               </div>
 
-              {/* 内嵌的删除确认弹窗 */}
+              {/* Inline delete confirm */}
               {showDeleteConfirm && (
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-[28px] z-20" onClick={(e) => e.stopPropagation()}>
-                  <div className="bg-white rounded-xl p-4 w-56 text-center shadow-md">
-                    <p className="font-semibold mb-3">确认删除此食材？</p>
+                <div
+                  className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-[12px] z-20"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="bg-white rounded-[8px] p-4 w-56 text-center shadow-md">
+                    <p className="font-semibold text-[#1a1a1a] mb-3" style={{ fontSize: "14px", lineHeight: 1.5 }}>
+                      确认删除此食材？
+                    </p>
                     <div className="flex gap-3">
-                      <button onClick={handleConfirmDelete} className="flex-1 bg-rose-600 text-white py-2 rounded-md">是，删除</button>
-                      <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 bg-gray-100 py-2 rounded-md">保留</button>
+                      <button
+                        onClick={handleConfirmDelete}
+                        className="flex-1 rounded-[8px] py-2 text-sm font-medium text-white"
+                        style={{ backgroundColor: "#e03131", fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
+                      >
+                        是，删除
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="flex-1 rounded-[8px] py-2 text-sm font-medium text-[#5d5b54]"
+                        style={{ backgroundColor: "#f6f5f4", fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
+                      >
+                        保留
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -200,44 +255,114 @@ export const FoodCard = React.memo(function FoodCard({
         </motion.div>
       </div>
 
-      {/* 独立的编辑模态框（Portal） */}
+      {/* Edit modal (Portal) */}
       {showEditModal &&
         typeof document !== "undefined" &&
         createPortal(
-          <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={() => setShowEditModal(false)}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onClick={() => setShowEditModal(false)}
+          >
             <div className="absolute inset-0 bg-black/50" />
-            <div className="relative bg-white rounded-xl p-6 w-full max-w-lg mx-4 shadow-lg z-10" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-lg font-semibold mb-3">编辑食材</h3>
+            <div
+              className="relative bg-white rounded-[12px] p-[24px] w-full max-w-sm mx-4 z-10"
+              style={{ boxShadow: "rgba(15, 15, 15, 0.16) 0px 16px 48px -8px" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3
+                className="text-base font-semibold text-[#1a1a1a] mb-4"
+                style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3 }}
+              >
+                编辑食材
+              </h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm block mb-1">名称</label>
-                  <input value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full border rounded px-2 py-2" />
+                  <label
+                    className="text-sm block mb-1 text-[#37352f]"
+                    style={{ fontSize: "14px", lineHeight: 1.5 }}
+                  >
+                    名称
+                  </label>
+                  <input
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full rounded-[8px] border border-[#c8c4be] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
+                    style={{ fontSize: "16px", lineHeight: 1.55, height: "44px" }}
+                  />
                 </div>
                 <div>
-                  <label className="text-sm block mb-1">数量</label>
-                  <input value={editCount} onChange={(e) => setEditCount(e.target.value)} type="number" className="w-full border rounded px-2 py-2" />
+                  <label
+                    className="text-sm block mb-1 text-[#37352f]"
+                    style={{ fontSize: "14px", lineHeight: 1.5 }}
+                  >
+                    数量
+                  </label>
+                  <input
+                    value={editCount}
+                    onChange={(e) => setEditCount(e.target.value)}
+                    type="number"
+                    className="w-full rounded-[8px] border border-[#c8c4be] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
+                    style={{ fontSize: "16px", lineHeight: 1.55, height: "44px" }}
+                  />
                 </div>
                 <div>
-                  <label className="text-sm block mb-1">保质期</label>
-                  <input value={editExpire} onChange={(e) => setEditExpire(e.target.value)} className="w-full border rounded px-2 py-2" />
+                  <label
+                    className="text-sm block mb-1 text-[#37352f]"
+                    style={{ fontSize: "14px", lineHeight: 1.5 }}
+                  >
+                    保质期
+                  </label>
+                  <input
+                    value={editExpire}
+                    onChange={(e) => setEditExpire(e.target.value)}
+                    className="w-full rounded-[8px] border border-[#c8c4be] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
+                    style={{ fontSize: "16px", lineHeight: 1.55, height: "44px" }}
+                  />
                 </div>
                 <div>
-                  <label className="text-sm block mb-1">放置层</label>
+                  <label
+                    className="text-sm block mb-1 text-[#37352f]"
+                    style={{ fontSize: "14px", lineHeight: 1.5 }}
+                  >
+                    放置层
+                  </label>
                   <div className="flex gap-4">
                     <label className="inline-flex items-center gap-2">
-                      <input type="radio" name={`zone-${food.id}`} checked={editZone === 'fridge'} onChange={() => setEditZone('fridge')} /> 
-                      <span>冷藏</span>
+                      <input
+                        type="radio"
+                        name={`zone-${food.id}`}
+                        checked={editZone === 'fridge'}
+                        onChange={() => setEditZone('fridge')}
+                      />
+                      <span className="text-sm text-[#37352f]">冷藏</span>
                     </label>
                     <label className="inline-flex items-center gap-2">
-                      <input type="radio" name={`zone-${food.id}`} checked={editZone === 'freeze'} onChange={() => setEditZone('freeze')} /> 
-                      <span>冷冻</span>
+                      <input
+                        type="radio"
+                        name={`zone-${food.id}`}
+                        checked={editZone === 'freeze'}
+                        onChange={() => setEditZone('freeze')}
+                      />
+                      <span className="text-sm text-[#37352f]">冷冻</span>
                     </label>
                   </div>
                 </div>
               </div>
               <div className="mt-4 flex gap-3 justify-end">
-                <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-100 rounded-md">取消</button>
-                <button onClick={handleSaveEdit} className="px-4 py-2 bg-lime-600 text-white rounded-md">保存</button>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="rounded-[8px] px-4 py-2 text-sm font-medium text-[#5d5b54] bg-[#f6f5f4] border border-[#e5e3df]"
+                  style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  className="rounded-[8px] px-4 py-2 text-sm font-medium text-white"
+                  style={{ backgroundColor: "#5645d4", fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
+                >
+                  保存
+                </button>
               </div>
             </div>
           </div>,

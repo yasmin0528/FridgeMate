@@ -30,7 +30,7 @@ export function SelectionOverlay({ food, open, onClose }: SelectionOverlayProps)
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
+      className="fixed inset-0 z-50 flex items-end justify-center"
       role="dialog"
       aria-modal="true"
     >
@@ -39,56 +39,70 @@ export function SelectionOverlay({ food, open, onClose }: SelectionOverlayProps)
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-xl rounded-t-2xl bg-white p-5 md:rounded-2xl md:p-6">
+      <div
+        className="relative z-10 w-full rounded-t-[12px] bg-white p-[24px]"
+        style={{
+          boxShadow: "rgba(15, 15, 15, 0.16) 0px -8px 32px -8px",
+        }}
+      >
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-lg font-semibold text-slate-900">{food.name}</p>
-            <p className="mt-1 text-sm text-slate-500">类别：{food.category}</p>
+            <p
+              className="text-sm font-semibold text-[#1a1a1a]"
+              style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3 }}
+            >
+              {food.name}
+            </p>
+            <p
+              className="mt-1 text-sm text-[#5d5b54]"
+              style={{ fontSize: "14px", lineHeight: 1.5 }}
+            >
+              类别：{food.category}
+            </p>
           </div>
-          <div className="text-sm text-slate-500">剩余：{food.count} 份</div>
+          <div
+            className="text-sm text-[#5d5b54]"
+            style={{ fontSize: "14px", lineHeight: 1.5 }}
+          >
+            剩余：{food.count} 份
+          </div>
         </div>
 
         <div className="mt-4 space-y-3">
-          <p className="text-sm text-slate-600">保质期：{food.expire}</p>
-
-          <div className="flex flex-wrap gap-2">
-            {selectedIds.map((id) => {
-              const f = FOODS_DATA.find((x) => String(x.id) === id);
-              if (f) {
-                return (
-                  <div key={id} className="rounded-md bg-slate-100 px-3 py-1 text-sm font-medium text-slate-800">
-                    {f.name}
-                  </div>
-                );
-              }
-              const ing = INGREDIENT_BY_ID.get(id);
-              if (ing) {
-                return (
-                  <div key={id} className="rounded-md bg-slate-100 px-3 py-1 text-sm font-medium text-slate-800">
-                    {ing.name}
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
+          <p
+            className="text-sm text-[#787671]"
+            style={{ fontSize: "14px", lineHeight: 1.5 }}
+          >
+            保质期：{food.expire}
+          </p>
 
           <div className="flex gap-2">
             <button
               onClick={handleToggle}
-              className={`flex-1 rounded-2xl px-4 py-2 text-sm font-medium ${isSelected(food) ? "bg-slate-900 text-white" : "bg-white border border-slate-200"}`}
+              className={`flex-1 rounded-[8px] px-4 py-2.5 text-sm font-medium ${
+                isSelected(food)
+                  ? "bg-[#1a1a1a] text-white"
+                  : "bg-white border border-[#c8c4be] text-[#1a1a1a]"
+              }`}
+              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
             >
               {isSelected(food) ? "已选中" : "选择食材"}
             </button>
             <button
               onClick={handleConfirm}
-              className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium"
+              className="flex-1 rounded-[8px] border border-[#c8c4be] px-4 py-2.5 text-sm font-medium text-[#1a1a1a]"
+              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
             >
               关闭
             </button>
           </div>
 
-          <div className="mt-2 text-xs text-slate-500">点击空白处关闭</div>
+          <div
+            className="text-center text-xs text-[#a4a097]"
+            style={{ fontSize: "12px", lineHeight: 1.4 }}
+          >
+            点击空白处关闭
+          </div>
         </div>
       </div>
     </div>
