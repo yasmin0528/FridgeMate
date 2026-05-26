@@ -6,6 +6,11 @@ import { BottomTab } from "@/components/BottomTab";
 export const metadata: Metadata = {
   title: "FridgeMate",
   description: "扫一下、抽一下、拍一下，居家减脂从冰箱开始",
+  icons: {
+    icon: "/file.svg",
+    shortcut: "/file.svg",
+    apple: "/file.svg",
+  },
 };
 
 export default function RootLayout({
