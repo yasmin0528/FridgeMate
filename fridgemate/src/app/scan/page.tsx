@@ -314,6 +314,8 @@ export default function UploadPage() {
     const provider =
       recognitionMeta.provider === "baidu"
         ? "\u767e\u5ea6"
+        : recognitionMeta.provider === "doubao"
+          ? "\u8c46\u5305"
         : recognitionMeta.provider.toUpperCase();
     const apis = recognitionMeta.imageApis?.length
       ? ` / ${recognitionMeta.imageApis.join(" + ")}`

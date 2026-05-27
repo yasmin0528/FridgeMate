@@ -44,7 +44,21 @@ type RecognitionResult = {
   meta?: RecognitionMeta;
 };
 
+type ChatCompletionPayload = {
+  choices?: Array<{
+    message?: {
+      content?: string | Array<{ type?: string; text?: string }>;
+    };
+  }>;
+  error?: {
+    message?: string;
+  };
+};
+
 let baiduAccessTokenCache: { token: string; expiresAt: number } | null = null;
+
+const FOOD_RECOGNITION_PROMPT =
+  "Recognize visible food ingredients in this refrigerator or food photo. Return JSON only, with this exact shape: {\"ingredients\":[{\"name\":\"ingredient name in Simplified Chinese\",\"amount\":\"visible or estimated amount in Simplified Chinese\",\"shelfLife\":\"estimated remaining shelf life in Simplified Chinese, like 3 天\",\"status\":\"fresh\"}]}. status must be one of fresh, soon, urgent. Prefer concrete ingredient names over broad labels. Estimate amount and shelf life when uncertain. If no food is visible, return {\"ingredients\":[]}.";
 
 const BAIDU_API_LABELS: Record<BaiduImageApi, string> = {
   ingredient: "\u679c\u852c\u8bc6\u522b",
@@ -188,6 +202,35 @@ function readOutputText(payload: unknown): string {
       .filter((text): text is string => Boolean(text))
       .join("") ?? ""
   );
+}
+
+function readChatCompletionText(payload: unknown): string {
+  if (!payload || typeof payload !== "object") {
+    return "";
+  }
+
+  const response = payload as ChatCompletionPayload;
+  const content = response.choices?.[0]?.message?.content;
+
+  if (typeof content === "string") {
+    return content;
+  }
+
+  return (
+    content
+      ?.map((part) => part.text)
+      .filter((text): text is string => Boolean(text))
+      .join("") ?? ""
+  );
+}
+
+function parseRecognitionJson(text: string) {
+  const cleaned = text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "");
+
+  return JSON.parse(cleaned) as { ingredients?: RecognitionItem[] };
 }
 
 function normalizeItems(items: RecognitionItem[]) {
@@ -528,8 +571,7 @@ async function recognizeWithGemini(file: File): Promise<RecognitionResult> {
                 },
               },
               {
-                text:
-                  "Recognize visible food ingredients in this refrigerator or food photo. Return JSON only. Use Simplified Chinese for ingredient names, amount, and shelfLife. Estimate amount and shelf life when uncertain. If no food is visible, return an empty ingredients array.",
+                text: FOOD_RECOGNITION_PROMPT,
               },
             ],
           },
@@ -552,7 +594,7 @@ async function recognizeWithGemini(file: File): Promise<RecognitionResult> {
   }
 
   const text = readGeminiText(payload);
-  const parsed = JSON.parse(text) as { ingredients?: RecognitionItem[] };
+  const parsed = parseRecognitionJson(text);
 
   return {
     ingredients: parsed.ingredients,
@@ -589,8 +631,7 @@ async function recognizeWithOpenAI(file: File): Promise<RecognitionResult> {
           content: [
             {
               type: "input_text",
-              text:
-                "Recognize visible food ingredients in this refrigerator or food photo. Return JSON only. Use Simplified Chinese for ingredient names, amount, and shelfLife. Estimate amount and shelf life when uncertain. If no food is visible, return an empty ingredients array.",
+              text: FOOD_RECOGNITION_PROMPT,
             },
             {
               type: "input_image",
@@ -621,12 +662,84 @@ async function recognizeWithOpenAI(file: File): Promise<RecognitionResult> {
   }
 
   const text = readOutputText(payload);
-  const parsed = JSON.parse(text) as { ingredients?: RecognitionItem[] };
+  const parsed = parseRecognitionJson(text);
 
   return {
     ingredients: parsed.ingredients,
     meta: {
       provider: "openai",
+    },
+  };
+}
+
+async function recognizeWithDoubao(file: File): Promise<RecognitionResult> {
+  const apiKey = process.env.ARK_API_KEY || process.env.DOUBAO_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      "\u672a\u914d\u7f6e ARK_API_KEY \u6216 DOUBAO_API_KEY\uff0c\u8bf7\u5728 .env.local \u4e2d\u6dfb\u52a0\u540e\u91cd\u542f\u5f00\u53d1\u670d\u52a1\u3002",
+    );
+  }
+
+  const imageBuffer = Buffer.from(await file.arrayBuffer());
+  const imageUrl = `data:${file.type};base64,${imageBuffer.toString("base64")}`;
+  const model = process.env.DOUBAO_MODEL || "doubao-seed-2-0-pro-260215";
+  const endpoint =
+    process.env.DOUBAO_BASE_URL ||
+    "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
+  const detail = process.env.DOUBAO_IMAGE_DETAIL || "high";
+
+  const doubaoResponse = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: FOOD_RECOGNITION_PROMPT,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageUrl,
+                detail,
+              },
+            },
+          ],
+        },
+      ],
+      response_format: {
+        type: "json_object",
+      },
+      temperature: 0.1,
+      max_tokens: 1200,
+    }),
+  });
+
+  const payload = (await doubaoResponse.json()) as ChatCompletionPayload;
+
+  if (!doubaoResponse.ok) {
+    throw new Error(
+      payload.error?.message ||
+        "\u8c46\u5305\u56fe\u50cf\u8bc6\u522b\u670d\u52a1\u8fd4\u56de\u9519\u8bef\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002",
+    );
+  }
+
+  const text = readChatCompletionText(payload);
+  const parsed = parseRecognitionJson(text);
+
+  return {
+    ingredients: parsed.ingredients,
+    meta: {
+      provider: "doubao",
+      imageApis: [model],
     },
   };
 }
@@ -662,6 +775,8 @@ export async function POST(request: Request) {
     const parsed =
       provider === "openai"
         ? await recognizeWithOpenAI(file)
+        : provider === "doubao"
+          ? await recognizeWithDoubao(file)
         : provider === "baidu"
           ? await recognizeWithBaidu(
               file,
