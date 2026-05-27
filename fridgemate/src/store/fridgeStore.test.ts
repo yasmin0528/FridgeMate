@@ -9,8 +9,22 @@ const empty: FridgeState = { inventory: [], selectedIds: [] };
 
 const sample: FridgeState = {
   inventory: [
-    { ingredientId: "egg", qty: 2, addedAt: 1700_000_000_000 },
-    { ingredientId: "tofu", qty: 1, addedAt: 1700_000_000_000 },
+    {
+      ingredientId: "egg",
+      qty: 2,
+      addedAt: 1700_000_000_000,
+      status: "fresh",
+      zone: "fridge",
+      shelfLife: "8 天",
+    },
+    {
+      ingredientId: "tofu",
+      qty: 1,
+      addedAt: 1700_000_000_000,
+      status: "soon",
+      zone: "fridge",
+      shelfLife: "2 天",
+    },
   ],
   selectedIds: ["egg"],
 };
@@ -25,6 +39,8 @@ describe("fridgeReducer · ADD_ITEMS", () => {
     expect(next.inventory).toHaveLength(1);
     expect(next.inventory[0].ingredientId).toBe("tomato");
     expect(next.inventory[0].qty).toBe(3);
+    expect(next.inventory[0].status).toBe("fresh");
+    expect(next.inventory[0].zone).toBe("fridge");
     expect(next.inventory[0].addedAt).toBeGreaterThan(0);
   });
 
@@ -37,6 +53,27 @@ describe("fridgeReducer · ADD_ITEMS", () => {
     expect(next.inventory).toHaveLength(2); // no new entry
     const egg = next.inventory.find((i) => i.ingredientId === "egg")!;
     expect(egg.qty).toBe(7); // 2 + 5
+  });
+
+  it("syncs freshness, shelf life, and zone when merging scanned items", () => {
+    const action: FridgeAction = {
+      type: "ADD_ITEMS",
+      items: [
+        {
+          ingredientId: "egg",
+          qty: 1,
+          status: "urgent",
+          zone: "freeze",
+          shelfLife: "今天",
+        },
+      ],
+    };
+    const next = fridgeReducer(sample, action);
+    const egg = next.inventory.find((i) => i.ingredientId === "egg")!;
+    expect(egg.qty).toBe(3);
+    expect(egg.status).toBe("urgent");
+    expect(egg.zone).toBe("freeze");
+    expect(egg.shelfLife).toBe("今天");
   });
 
   it("can add multiple items in one action", () => {
@@ -138,7 +175,16 @@ describe("fridgeReducer · CLEAR_SELECTION", () => {
 describe("fridgeReducer · HYDRATE", () => {
   it("replaces state entirely with the hydrated value", () => {
     const hydrated: FridgeState = {
-      inventory: [{ ingredientId: "x", qty: 9, addedAt: 1 }],
+      inventory: [
+        {
+          ingredientId: "x",
+          qty: 9,
+          addedAt: 1,
+          status: "fresh",
+          zone: "fridge",
+          shelfLife: "1 天",
+        },
+      ],
       selectedIds: ["x"],
     };
     const next = fridgeReducer(sample, { type: "HYDRATE", state: hydrated });

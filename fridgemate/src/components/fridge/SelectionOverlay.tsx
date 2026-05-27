@@ -3,8 +3,6 @@
 import React, { useCallback } from "react";
 import { Food } from "@/types/food";
 import { useFridgeStore } from "@/store/fridgeStore";
-import { FOODS_DATA } from "@/data/foods";
-import { INGREDIENT_BY_ID } from "@/mock/ingredients";
 
 interface SelectionOverlayProps {
   food: Food | null;
@@ -15,11 +13,12 @@ interface SelectionOverlayProps {
 export function SelectionOverlay({ food, open, onClose }: SelectionOverlayProps) {
   const { selectedIds, toggleSelect } = useFridgeStore();
 
-  const isSelected = (f: Food) => selectedIds.includes(String(f.id));
+  const isSelected = (f: Food) =>
+    selectedIds.includes(f.ingredientId ?? String(f.id));
 
   const handleToggle = useCallback(() => {
     if (!food) return;
-    toggleSelect(String(food.id));
+    toggleSelect(food.ingredientId ?? String(food.id));
   }, [food, toggleSelect]);
 
   const handleConfirm = useCallback(() => {

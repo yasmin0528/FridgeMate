@@ -4,7 +4,6 @@ import React from "react";
 import { Food } from "@/types/food";
 import { FoodCard } from "./FoodCard";
 import { useFridgeStore } from "@/store/fridgeStore";
-import { INGREDIENT_BY_ID } from "@/mock/ingredients";
 
 interface FridgeGridProps {
   foods: Food[];
@@ -25,10 +24,7 @@ export const FridgeGrid = React.memo(function FridgeGrid({
 
   const isFoodSelected = (id: number) => {
     const f = foods.find((x) => x.id === id);
-    if (f) {
-      const match = Array.from(INGREDIENT_BY_ID.values()).find((ing) => ing.name === f.name);
-      if (match) return selectedSet.has(match.id);
-    }
+    if (f?.ingredientId) return selectedSet.has(f.ingredientId);
     return selectedSet.has(String(id));
   };
 
