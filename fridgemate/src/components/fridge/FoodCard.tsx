@@ -14,6 +14,12 @@ interface FoodCardProps {
   onDelete?: (food: Food) => void;
 }
 
+const STATUS_META = {
+  fresh: { label: "新鲜", className: "bg-[#d9f3e1] text-[#1aae39]" },
+  soon: { label: "临期", className: "bg-[#fef7d6] text-[#793400]" },
+  urgent: { label: "需尽快处理", className: "bg-[#ffe8d4] text-[#dd5b00]" },
+} as const;
+
 export const FoodCard = React.memo(function FoodCard({
   food,
   isSelected,
@@ -66,12 +72,16 @@ export const FoodCard = React.memo(function FoodCard({
   const [editCount, setEditCount] = useState(String(food.count));
   const [editExpire, setEditExpire] = useState(food.expire);
   const [editZone, setEditZone] = useState<"fridge" | "freeze">(food.zone);
+  const [editStatus, setEditStatus] = useState<"fresh" | "soon" | "urgent">(
+    food.status ?? "fresh",
+  );
 
   useEffect(() => {
     setEditName(food.name);
     setEditCount(String(food.count));
     setEditExpire(food.expire);
     setEditZone(food.zone);
+    setEditStatus(food.status ?? "fresh");
   }, [food]);
 
   const handleSaveEdit = useCallback(() => {
@@ -81,10 +91,11 @@ export const FoodCard = React.memo(function FoodCard({
       count: Number(editCount) || food.count,
       expire: editExpire,
       zone: editZone,
+      status: editStatus,
     };
     onEdit?.(updated);
     setShowEditModal(false);
-  }, [editName, editCount, editExpire, editZone, food, onEdit]);
+  }, [editName, editCount, editExpire, editZone, editStatus, food, onEdit]);
 
   const handleConfirmDelete = useCallback(() => {
     onDelete?.(food);
@@ -126,7 +137,7 @@ export const FoodCard = React.memo(function FoodCard({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleSelect(e as any);
+                    handleSelect(e);
                   }}
                   aria-pressed={isSelected}
                   className={`absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-[6px] border ${
@@ -161,6 +172,17 @@ export const FoodCard = React.memo(function FoodCard({
                 >
                   {food.expire}
                 </div>
+                {food.status ? (
+                  <div className="absolute left-3 top-3">
+                    <span
+                      className={`rounded-[6px] px-2 py-1 text-xs font-semibold ${
+                        STATUS_META[food.status].className
+                      }`}
+                    >
+                      {STATUS_META[food.status].label}
+                    </span>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -198,6 +220,14 @@ export const FoodCard = React.memo(function FoodCard({
                   >
                     {food.expire}
                   </p>
+                  {food.status ? (
+                    <p
+                      className="mt-2 text-sm font-medium text-[#37352f]"
+                      style={{ fontSize: "14px", lineHeight: 1.5 }}
+                    >
+                      新鲜度：{STATUS_META[food.status].label}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -346,6 +376,30 @@ export const FoodCard = React.memo(function FoodCard({
                       <span className="text-sm text-[#37352f]">冷冻</span>
                     </label>
                   </div>
+                </div>
+                <div>
+                  <label
+                    className="text-sm block mb-1 text-[#37352f]"
+                    style={{ fontSize: "14px", lineHeight: 1.5 }}
+                  >
+                    新鲜度
+                  </label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) =>
+                      setEditStatus(
+                        e.target.value as "fresh" | "soon" | "urgent",
+                      )
+                    }
+                    className="w-full rounded-[8px] border border-[#c8c4be] px-3 py-2 text-sm text-[#1a1a1a] bg-white"
+                    style={{ fontSize: "16px", lineHeight: 1.55, height: "44px" }}
+                  >
+                    {Object.entries(STATUS_META).map(([value, meta]) => (
+                      <option key={value} value={value}>
+                        {meta.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="mt-4 flex gap-3 justify-end">

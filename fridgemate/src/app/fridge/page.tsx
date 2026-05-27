@@ -2,10 +2,9 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FridgeGrid, TaskBar, TopBar, SelectedFridgeBar } from "@/components/fridge";
+import { FridgeGrid, TopBar, SelectedFridgeBar } from "@/components/fridge";
 import { CategorySidebar, FilterMode } from "@/components/fridge/CategorySidebar";
 import { SelectionOverlay } from "@/components/fridge/SelectionOverlay";
-import { FOODS_DATA } from "@/data/foods";
 import { useFridgeStore } from "@/store/fridgeStore";
 import { INGREDIENT_BY_ID } from "@/mock/ingredients";
 import { Food } from "@/types/food";
@@ -26,9 +25,31 @@ const CATEGORY_OPTIONS = [
   { key: "protein", label: "高蛋白" },
 ];
 
+const CATEGORY_MAP: Record<string, Food["category"]> = {
+  veg: "vegetable",
+  fruit: "fruit",
+  dairy: "drink",
+  protein: "meat",
+  carb: "grain",
+  aromatic: "vegetable",
+  seasoning: "other",
+};
+
+const SCAN_CATEGORY_MAP: Record<string, Food["category"]> = {
+  vegetable: "vegetable",
+  fruit: "fruit",
+  dairy: "drink",
+  meat: "meat",
+  grain: "grain",
+  protein: "protein",
+};
+
+function foodIdFromIngredientId(id: string) {
+  return [...id].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+}
+
 export default function FridgePage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [foods, setFoods] = useState<Food[]>([]);
   const [filterMode, setFilterMode] = useState<FilterMode>("zone");
   const [selectedFilter, setSelectedFilter] = useState("all");
 
@@ -38,7 +59,6 @@ export default function FridgePage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setFoods(FOODS_DATA);
       setIsLoading(false);
     }, 300);
 
@@ -50,36 +70,66 @@ export default function FridgePage() {
     setOverlayOpen(true);
   }, []);
 
-  const { toggleSelect, selectedSet } = useFridgeStore();
+  const { inventory, toggleSelect, updateItem, removeItem } = useFridgeStore();
+
+  const foods = useMemo<Food[]>(
+    () =>
+      inventory.flatMap((item) => {
+        const ingredient = INGREDIENT_BY_ID.get(item.ingredientId);
+
+        if (!ingredient && !item.name) {
+          return [];
+        }
+
+        return {
+          id: foodIdFromIngredientId(item.ingredientId),
+          ingredientId: item.ingredientId,
+          name: ingredient?.name ?? item.name ?? "未命名食材",
+          count: item.qty,
+          expire: item.shelfLife,
+          category: item.category
+            ? SCAN_CATEGORY_MAP[item.category]
+            : ingredient
+              ? CATEGORY_MAP[ingredient.category] ?? "other"
+              : "other",
+          zone: item.zone,
+          status: item.status,
+        };
+      }),
+    [inventory],
+  );
 
   const handleSelectFood = useCallback((food: Food) => {
-    const match = Array.from(INGREDIENT_BY_ID.values()).find((ing) => ing.name === food.name);
-    if (match) {
-      toggleSelect(match.id);
-    } else {
-      toggleSelect(String(food.id));
-    }
+    toggleSelect(food.ingredientId ?? String(food.id));
     setSelectedBarOpen(true);
   }, [toggleSelect]);
 
   const handleEditFood = useCallback((updated: Food) => {
-    setFoods((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
-  }, []);
+    if (!updated.ingredientId) return;
+
+    updateItem({
+      ingredientId: updated.ingredientId,
+      qty: updated.count,
+      shelfLife: updated.expire,
+      zone: updated.zone,
+      status: updated.status,
+    });
+  }, [updateItem]);
 
   const handleRemoveFood = useCallback((food: Food) => {
-    setFoods((prev) => prev.filter((f) => f.id !== food.id));
-    if (selectedSet.has(String(food.id))) toggleSelect(String(food.id));
-  }, [selectedSet, toggleSelect]);
+    const id = food.ingredientId ?? String(food.id);
+    removeItem(id);
+  }, [removeItem]);
 
   const filteredFoods = useMemo(() => {
     if (filterMode === "zone") {
       return selectedFilter === "all"
         ? foods
-        : foods.filter((food) => food.zone === (selectedFilter as any));
+        : foods.filter((food) => food.zone === selectedFilter);
     }
     return selectedFilter === "all"
       ? foods
-      : foods.filter((food) => food.category === (selectedFilter as any));
+      : foods.filter((food) => food.category === selectedFilter);
   }, [foods, filterMode, selectedFilter]);
 
   if (isLoading) {
