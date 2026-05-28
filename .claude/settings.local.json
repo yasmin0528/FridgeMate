@@ -1,9 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build)",
-      "Bash(npx tsc:*)",
-      "Bash(npm test)"
+      "Bash(node -e \"\n// Check more ingredient IDs for collisions\nconst mockIds = [\n  ''chicken_breast'', ''chicken_thigh'', ''egg'', ''beef'', ''beef_brisket'',\n  ''pork_loin'', ''pork_belly'', ''pork_ribs'', ''ground_pork'', ''lamb'',\n  ''fish'', ''shrimp'', ''tofu'', ''broccoli'', ''tomato'',\n  ''cucumber'', ''spinach'', ''mushroom'', ''bell_pepper'', ''seaweed'',\n  ''cabbage'', ''radish'', ''eggplant'', ''chive'', ''cilantro'',\n  ''wood_ear'', ''bean_sprout'', ''carrot'', ''potato'', ''enoki'',\n  ''scallion'', ''ginger'', ''garlic'', ''sichuan_pepper'', ''bird_chili'',\n  ''salt'', ''pepper'', ''soy_sauce'', ''vinegar'', ''chili'',\n  ''sugar'', ''cooking_wine'', ''sesame_oil'', ''oyster_sauce'',\n  ''milk'', ''yogurt'', ''cheese'',\n  ''apple'', ''banana'', ''blueberry'',\n  ''rice'', ''noodle'', ''oat''\n];\n\n// Also check recipeRef IDs (ingredient refs in recipes)\nconst recipeRefIds = [\n  ''chicken_breast'', ''broccoli'', ''garlic'', ''salt'', ''pepper'',\n  ''oat'', ''milk'', ''blueberry'', ''banana'', ''apple'', ''yogurt'',\n  ''cucumber'', ''tomato'', ''cheese'',\n  ''egg'', ''scallion'',\n  ''pork_loin'', ''mushroom'', ''spinach'',\n  ''seaweed'',\n  ''pork_belly'', ''soy_sauce'',\n  ''bell_pepper'', ''chili'', ''sichuan_pepper'', ''vinegar'',\n  ''tofu'', ''ground_pork'',\n  ''pork_ribs'', ''cooking_wine'', ''sugar'',\n  ''radish'', ''ginger'',\n  ''chicken_thigh'', ''oyster_sauce'',\n  ''lamb'',\n  ''beef_brisket'',\n  ''eggplant'',\n  ''bean_sprout'', ''bird_chili'',\n  ''potato'',\n  ''enoki'', ''carrot'',\n  ''beef'', ''cilantro'', ''sesame_oil'',\n  ''chive'',\n  ''cabbage'',\n  ''wood_ear'',\n  ''fish'',\n  ''shrimp''\n];\n\nconst allIds = [...new Set([...mockIds, ...recipeRefIds])];\n\nfunction foodIdFromIngredientId(id) {\n  return [...id].reduce((sum, char) => sum + char.charCodeAt(0), 0);\n}\n\nconst map = {};\nfor (const id of allIds) {\n  const fid = foodIdFromIngredientId(id);\n  if (!map[fid]) map[fid] = [];\n  map[fid].push(id);\n}\n\nlet duplicateCount = 0;\nfor (const [fid, ingredients] of Object.entries(map)) {\n  if (ingredients.length > 1) {\n    console.log(''DUPLICATE ID '' + fid + '': '' + ingredients.join('', ''));\n    duplicateCount++;\n  }\n}\n\nif (duplicateCount === 0) {\n  console.log(''No duplicates found among all ingredient IDs'');\n} else {\n  console.log(''\\nTotal '' + duplicateCount + '' duplicate ID groups found'');\n}\n\")",
+      "Bash(npm install)",
+      "Bash(npx vitest run:*)",
+      "Bash(echo:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

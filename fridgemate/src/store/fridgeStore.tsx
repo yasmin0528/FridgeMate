@@ -55,13 +55,20 @@ export type FridgeAction =
   | { type: "CLEAR_SELECTION" }
   | { type: "HYDRATE"; state: FridgeState };
 
+/** Ingredients that belong in the freezer by default */
+const FREEZER_IDS = new Set([
+  "chicken_breast", "chicken_thigh", "beef", "beef_brisket",
+  "pork_loin", "pork_belly", "pork_ribs", "ground_pork", "lamb",
+  "fish", "shrimp",
+]);
+
 const INITIAL: FridgeState = {
   inventory: MOCK_INGREDIENTS.filter((i) => !i.isPantry).map((i) => ({
     ingredientId: i.id,
     qty: 1,
     addedAt: Date.now(),
     status: "fresh",
-    zone: "fridge",
+    zone: FREEZER_IDS.has(i.id) ? "freeze" : "fridge",
     shelfLife: i.shelfLifeDays ? `${i.shelfLifeDays} 天` : "待确认",
   })),
   selectedIds: [],

@@ -6,10 +6,10 @@ import { Food } from "@/types/food";
 interface FoodStoreState {
   selectedFoods: Food[];
   addFood: (food: Food) => void;
-  removeFood: (foodId: number) => void;
+  removeFood: (foodId: string) => void;
   toggleFood: (food: Food) => void;
   clearFoods: () => void;
-  isFoodSelected: (foodId: number) => boolean;
+  isFoodSelected: (foodId: string) => boolean;
 }
 
 export const useFoodStore = create<FoodStoreState>((set, get) => ({
@@ -27,7 +27,7 @@ export const useFoodStore = create<FoodStoreState>((set, get) => ({
     });
   },
 
-  removeFood: (foodId: number) => {
+  removeFood: (foodId: string) => {
     set((state) => ({
       selectedFoods: state.selectedFoods.filter((f) => f.id !== foodId),
     }));
@@ -52,7 +52,7 @@ export const useFoodStore = create<FoodStoreState>((set, get) => ({
     set({ selectedFoods: [] });
   },
 
-  isFoodSelected: (foodId: number) => {
+  isFoodSelected: (foodId: string) => {
     const state = get();
     return state.selectedFoods.some((f) => f.id === foodId);
   },

@@ -70,7 +70,7 @@ export const SelectedFridgeBar = React.memo(function SelectedFridgeBar({
 
         <div className="flex flex-wrap gap-2 mb-3">
           {selectedIds.map((id) => {
-            const f = FOODS_DATA.find((x) => String(x.id) === id);
+            const f = FOODS_DATA.find((x) => x.id === id);
             if (f) {
               return (
                 <div

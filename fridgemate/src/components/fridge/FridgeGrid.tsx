@@ -22,7 +22,7 @@ export const FridgeGrid = React.memo(function FridgeGrid({
 }: FridgeGridProps) {
   const { selectedSet } = useFridgeStore();
 
-  const isFoodSelected = (id: number) => {
+  const isFoodSelected = (id: string) => {
     const f = foods.find((x) => x.id === id);
     if (f?.ingredientId) return selectedSet.has(f.ingredientId);
     return selectedSet.has(String(id));

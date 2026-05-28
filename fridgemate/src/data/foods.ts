@@ -3,7 +3,7 @@ import { Food } from "@/types/food";
 export const FOODS_DATA: Food[] = [
   // 冰箱食材
   {
-    id: 1,
+    id: "1",
     name: "鸡蛋",
     count: 6,
     expire: "8天",
@@ -11,7 +11,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 2,
+    id: "2",
     name: "牛奶",
     count: 1,
     expire: "1天",
@@ -19,7 +19,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 3,
+    id: "3",
     name: "番茄",
     count: 3,
     expire: "5天",
@@ -27,7 +27,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 4,
+    id: "4",
     name: "苹果",
     count: 5,
     expire: "15天",
@@ -35,7 +35,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 5,
+    id: "5",
     name: "菠菜",
     count: 2,
     expire: "3天",
@@ -43,7 +43,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 6,
+    id: "6",
     name: "面包",
     count: 1,
     expire: "2天",
@@ -51,7 +51,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 7,
+    id: "7",
     name: "鱼",
     count: 2,
     expire: "2天",
@@ -59,7 +59,7 @@ export const FOODS_DATA: Food[] = [
     zone: "fridge",
   },
   {
-    id: 8,
+    id: "8",
     name: "鸡肉",
     count: 1,
     expire: "4天",
@@ -69,7 +69,7 @@ export const FOODS_DATA: Food[] = [
 
   // 冷冻层食材
   {
-    id: 9,
+    id: "9",
     name: "香蕉",
     count: 4,
     expire: "30天",
@@ -77,7 +77,7 @@ export const FOODS_DATA: Food[] = [
     zone: "freeze",
   },
   {
-    id: 10,
+    id: "10",
     name: "牛肉",
     count: 1,
     expire: "60天",
@@ -85,7 +85,7 @@ export const FOODS_DATA: Food[] = [
     zone: "freeze",
   },
   {
-    id: 11,
+    id: "11",
     name: "虾",
     count: 10,
     expire: "45天",
@@ -93,7 +93,7 @@ export const FOODS_DATA: Food[] = [
     zone: "freeze",
   },
   {
-    id: 12,
+    id: "12",
     name: "玉米",
     count: 3,
     expire: "90天",
@@ -101,7 +101,7 @@ export const FOODS_DATA: Food[] = [
     zone: "freeze",
   },
   {
-    id: 13,
+    id: "13",
     name: "冰淇淋",
     count: 1,
     expire: "120天",
@@ -109,7 +109,7 @@ export const FOODS_DATA: Food[] = [
     zone: "freeze",
   },
   {
-    id: 14,
+    id: "14",
     name: "豌豆",
     count: 2,
     expire: "90天",

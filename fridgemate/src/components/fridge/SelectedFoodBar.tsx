@@ -26,7 +26,7 @@ export const SelectedFoodBar = React.memo(function SelectedFoodBar({
   const clearFoods = useFoodStore((state) => state.clearFoods);
 
   const handleRemoveFood = useCallback(
-    (e: React.MouseEvent, foodId: number) => {
+    (e: React.MouseEvent, foodId: string) => {
       e.stopPropagation();
       removeFood(foodId);
     },

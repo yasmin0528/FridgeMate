@@ -27,35 +27,12 @@ export const FoodCard = React.memo(function FoodCard({
   onEdit,
   onDelete,
 }: FoodCardProps) {
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < 768 : false
-  );
   const [isFlipped, setIsFlipped] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  // Toggle flip on click — same behavior on mobile & desktop, per-card independent
   const handleFlip = useCallback(() => {
-    if (isMobile) {
-      setIsFlipped((current) => !current);
-    }
-  }, [isMobile]);
-
-  const handleMouseEnter = useCallback(() => {
-    if (!isMobile) {
-      setIsFlipped(true);
-    }
-  }, [isMobile]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isMobile) {
-      setIsFlipped(false);
-    }
-  }, [isMobile]);
+    setIsFlipped((current) => !current);
+  }, []);
 
   const handleSelect = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -106,14 +83,12 @@ export const FoodCard = React.memo(function FoodCard({
     <motion.article
       className="h-full rounded-[12px] border border-[#e5e3df] bg-white"
       style={{ boxShadow: isSelected ? "rgba(15, 15, 15, 0.08) 0px 4px 12px 0px" : "rgba(15, 15, 15, 0.04) 0px 1px 2px 0px" }}
-      whileHover={!isMobile ? { y: -2 } : undefined}
+      whileHover={{ y: -2 }}
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
     >
       <div
         className="relative h-full w-full cursor-pointer overflow-hidden rounded-[12px]"
         onClick={handleFlip}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         <motion.div className="h-full w-full" style={{ perspective: 1200 }}>
           <motion.div
@@ -192,47 +167,31 @@ export const FoodCard = React.memo(function FoodCard({
               style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" } as React.CSSProperties}
             >
               {/* Detail area */}
-              <div className="p-[20px] flex-1">
-                <div>
-                  <p
-                    className="text-xs font-semibold uppercase text-[#787671]"
-                    style={{ fontSize: "11px", fontWeight: 600, lineHeight: 1.4, letterSpacing: "1px" }}
-                  >
-                    食材详情
-                  </p>
-                  <div className="mt-4 flex items-center gap-3">
-                    <p
-                      className="text-base font-semibold text-[#1a1a1a]"
-                      style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3 }}
-                    >
-                      {food.name}
-                    </p>
-                    <span
-                      className="text-sm text-[#5d5b54] capitalize"
-                      style={{ fontSize: "14px", lineHeight: 1.5 }}
-                    >
-                      {food.category}
-                    </span>
-                  </div>
-                  <p
-                    className="mt-2 text-sm text-[#787671]"
-                    style={{ fontSize: "14px", lineHeight: 1.5 }}
-                  >
+              <div className="p-[20px] flex-1 flex flex-col">
+                <p
+                  className="text-xs font-semibold uppercase text-[#787671]"
+                  style={{ fontSize: "11px", fontWeight: 600, lineHeight: 1.4, letterSpacing: "1px" }}
+                >
+                  食材详情
+                </p>
+                <p
+                  className="mt-3 text-base font-semibold text-[#1a1a1a]"
+                  style={{ fontSize: "17px", fontWeight: 600, lineHeight: 1.3 }}
+                >
+                  {food.name}
+                </p>
+                <div className="mt-auto flex items-center justify-between">
+                  <span className="text-sm font-semibold text-[#1a1a1a]" style={{ fontSize: "15px", lineHeight: 1.5 }}>
+                    {food.count} 份
+                  </span>
+                  <span className="text-sm font-semibold text-[#1a1a1a]" style={{ fontSize: "15px", lineHeight: 1.5 }}>
                     {food.expire}
-                  </p>
-                  {food.status ? (
-                    <p
-                      className="mt-2 text-sm font-medium text-[#37352f]"
-                      style={{ fontSize: "14px", lineHeight: 1.5 }}
-                    >
-                      新鲜度：{STATUS_META[food.status].label}
-                    </p>
-                  ) : null}
+                  </span>
                 </div>
               </div>
 
-              {/* Action buttons */}
-              <div className="w-full flex h-14 overflow-hidden">
+              {/* Action buttons — ~20% height */}
+              <div className="w-full flex h-[18%] min-h-[44px] overflow-hidden">
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setShowEditModal(true); }}

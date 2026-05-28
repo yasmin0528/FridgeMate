@@ -1,94 +1,70 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 
 interface TopBarProps {
-  userName?: string;
-  level?: number;
-  checkInDays?: number;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
 }
 
 export const TopBar = React.memo(function TopBar({
-  userName = "用户",
-  level = 5,
-  checkInDays = 12,
+  searchQuery,
+  onSearchChange,
 }: TopBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleClear = useCallback(() => {
+    onSearchChange("");
+    inputRef.current?.focus();
+  }, [onSearchChange]);
+
   return (
     <div className="bg-white border-b border-[#e5e3df]">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Left: user info */}
-          <div className="flex items-center gap-3">
-            <motion.div
-              className="w-10 h-10 rounded-[8px] bg-[#5645d4] flex items-center justify-center text-white font-semibold text-sm cursor-pointer shrink-0"
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              {userName.charAt(0)}
-            </motion.div>
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-3">
+        <div className="relative">
+          {/* Search icon */}
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#a4a097"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
 
-            <div className="flex-1 min-w-0">
-              <p
-                className="text-sm font-semibold text-[#1a1a1a] truncate"
-                style={{ fontSize: "14px", fontWeight: 600, lineHeight: 1.5 }}
-              >
-                {userName}
-              </p>
-              <div className="flex gap-3 mt-1">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-[#787671]" style={{ fontSize: "13px", lineHeight: 1.4 }}>
-                    等级
-                  </span>
-                  <span className="text-xs font-semibold text-[#5645d4] bg-[#e6e0f5] px-2 py-0.5 rounded-[6px]">
-                    Lv.{level}
-                  </span>
-                </div>
+          <input
+            ref={inputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="搜索食材…"
+            className="w-full rounded-[10px] border border-[#e5e3df] bg-[#f6f5f4] pl-9 pr-8 py-2.5 text-sm text-[#1a1a1a] outline-none transition-colors placeholder:text-[#a4a097] focus:bg-white focus:border-[#c8c4be]"
+            style={{ fontSize: "14px", lineHeight: 1.5 }}
+          />
 
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-[#787671]" style={{ fontSize: "13px", lineHeight: 1.4 }}>
-                    打卡
-                  </span>
-                  <span className="text-xs font-semibold text-[#dd5b00] bg-[#ffe8d4] px-2 py-0.5 rounded-[6px]">
-                    {checkInDays}天
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: action buttons */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Clear button */}
+          {searchQuery && (
             <motion.button
-              className="relative p-2 rounded-[8px] hover:bg-[#f6f5f4] transition-colors duration-200"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="通知"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-[#a4a097] hover:text-[#5d5b54] transition-colors"
+              onClick={handleClear}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              aria-label="清空搜索"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5d5b54" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-              <motion.div
-                className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#e03131] rounded-full"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-            </motion.button>
-
-            <motion.button
-              className="p-2 rounded-[8px] hover:bg-[#f6f5f4] transition-colors duration-200"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="更多"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5d5b54" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="1" />
-                <circle cx="19" cy="12" r="1" />
-                <circle cx="5" cy="12" r="1" />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
               </svg>
             </motion.button>
-          </div>
+          )}
         </div>
       </div>
     </div>
