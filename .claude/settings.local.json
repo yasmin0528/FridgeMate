@@ -5,7 +5,10 @@
       "Bash(npm install)",
       "Bash(npx vitest run:*)",
       "Bash(echo:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx next build:*)",
+      "Bash(awk '{cnt[$1]++} END{for(c in cnt) printf \"\"\"\"%3d %s\\n\"\"\"\", cnt[c], c}')",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []

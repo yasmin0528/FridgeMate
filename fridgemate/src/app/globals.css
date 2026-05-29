@@ -1,46 +1,358 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  FridgeMate Design System — Emotional UI / Claymorphism
+ *  Inspired by Finch, Duolingo & Headspace
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  --color-primary: #10B981;
-  --color-primary-dark: #059669;
-  --color-primary-light: #D1FAE5;
-  --color-accent: #F97316;
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-bg: #FAFAF9;
-  --color-surface: #FFFFFF;
-  --color-border: #E7E5E4;
-  --color-text-primary: #1C1917;
-  --color-text-secondary: #57534E;
-  --color-text-tertiary: #A8A29E;
-  --color-protein: #3B82F6;
-  --color-carb: #F59E0B;
-  --color-fat: #EC4899;
+  /* Brand */
+  --color-primary: #7BCF8E;
+  --color-primary-pressed: #69BD7C;
+  --color-primary-deep: #57A968;
+  --color-on-primary: #FFFFFF;
+
+  --color-secondary: #FFC97A;
+  --color-secondary-soft: #FFE7BF;
+
+  --color-accent-coral: #FF9E8A;
+  --color-accent-peach: #FFD8C2;
+  --color-accent-lavender: #CDBDFF;
+  --color-accent-sky: #BFE7FF;
+
+  /* Background */
+  --color-canvas: #FFFDF8;
+  --color-surface: #F8F6F1;
+  --color-surface-soft: #FCFBF8;
+  --color-surface-elevated: #FFFFFF;
+
+  /* Card Tints */
+  --color-card-mint: #E5F7EA;
+  --color-card-peach: #FFF0E4;
+  --color-card-banana: #FFF7CC;
+  --color-card-lavender: #F1EBFF;
+  --color-card-sky: #E8F6FF;
+  --color-card-strawberry: #FFE5EA;
+
+  /* Text */
+  --color-ink: #2B2B2B;
+  --color-ink-soft: #5F5B53;
+  --color-ink-muted: #8F8A82;
+  --color-on-dark: #FFFFFF;
+
+  /* Borders */
+  --color-hairline: #ECE7DF;
+  --color-hairline-soft: #F3EFE8;
+
+  /* Semantic */
+  --color-success: #7BCF8E;
+  --color-warning: #FFB84D;
+  --color-error: #FF7A7A;
+
+  /* Shadow tints */
+  --shadow-mint: rgba(123, 207, 142, 0.12);
+  --shadow-peach: rgba(255, 201, 122, 0.16);
 }
 
 @theme inline {
   --color-primary: var(--color-primary);
-  --color-primary-dark: var(--color-primary-dark);
-  --color-primary-light: var(--color-primary-light);
-  --color-accent: var(--color-accent);
-  --color-bg: var(--color-bg);
+  --color-primary-pressed: var(--color-primary-pressed);
+  --color-primary-deep: var(--color-primary-deep);
+  --color-on-primary: var(--color-on-primary);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-soft: var(--color-secondary-soft);
+  --color-accent-coral: var(--color-accent-coral);
+  --color-accent-peach: var(--color-accent-peach);
+  --color-accent-lavender: var(--color-accent-lavender);
+  --color-accent-sky: var(--color-accent-sky);
+  --color-canvas: var(--color-canvas);
   --color-surface: var(--color-surface);
-  --color-border: var(--color-border);
-  --color-text-primary: var(--color-text-primary);
-  --color-text-secondary: var(--color-text-secondary);
-  --color-text-tertiary: var(--color-text-tertiary);
-  --font-sans: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --color-surface-soft: var(--color-surface-soft);
+  --color-surface-elevated: var(--color-surface-elevated);
+  --color-card-mint: var(--color-card-mint);
+  --color-card-peach: var(--color-card-peach);
+  --color-card-banana: var(--color-card-banana);
+  --color-card-lavender: var(--color-card-lavender);
+  --color-card-sky: var(--color-card-sky);
+  --color-card-strawberry: var(--color-card-strawberry);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-on-dark: var(--color-on-dark);
+  --color-hairline: var(--color-hairline);
+  --color-hairline-soft: var(--color-hairline-soft);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+
+  --font-sans: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --font-mono: "SF Mono", "JetBrains Mono", ui-monospace;
 }
 
+/* ── Reset & Base ──────────────────────────────────────────────────────── */
+
 html, body {
-  background: var(--color-bg);
-  color: var(--color-text-primary);
+  background: var(--color-canvas);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 body {
   display: flex;
   flex-direction: column;
+  line-height: 1.5;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 999px;
+}
+
+/* ── Utility classes ───────────────────────────────────────────────────── */
+
+/* Claymorphism card base */
+.clay-card {
+  background: var(--color-surface-elevated);
+  border-radius: 28px;
+  box-shadow:
+    0 2px 8px rgba(43, 43, 43, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+    0 -1px 0 rgba(43, 43, 43, 0.03) inset;
+}
+
+.clay-card-soft {
+  background: var(--color-surface);
+  border-radius: 28px;
+  box-shadow:
+    0 2px 8px rgba(43, 43, 43, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+/* Emotional card with color tint */
+.emotion-card {
+  border-radius: 28px;
+  padding: 20px;
+  box-shadow:
+    0 4px 16px rgba(43, 43, 43, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+/* Pill button — primary */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  box-shadow:
+    0 4px 12px var(--shadow-mint),
+    0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:active {
+  transform: scale(0.97);
+  background: var(--color-primary-pressed);
+}
+
+/* Pill button — secondary */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--color-ink-soft);
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  border: 1.5px solid var(--color-hairline);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-secondary:active {
+  transform: scale(0.97);
+  background: var(--color-surface);
+}
+
+/* Ghost button */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--color-ink-soft);
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+.btn-ghost:active {
+  background: var(--color-surface);
+}
+
+/* Floating element base */
+.floating-element {
+  filter: drop-shadow(0 4px 12px rgba(43, 43, 43, 0.08));
+}
+
+/* Soft gradient backgrounds */
+.bg-gradient-warm {
+  background: linear-gradient(135deg, var(--color-card-peach) 0%, var(--color-card-banana) 50%, var(--color-card-mint) 100%);
+}
+
+.bg-gradient-mint {
+  background: linear-gradient(135deg, var(--color-card-mint) 0%, var(--color-card-sky) 100%);
+}
+
+.bg-gradient-lavender {
+  background: linear-gradient(135deg, var(--color-card-lavender) 0%, var(--color-card-sky) 100%);
+}
+
+/* Bento grid cell */
+.bento-cell {
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(43, 43, 43, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+/* Smooth organic shape — pill-like container */
+.organic-pill {
+  border-radius: 9999px;
+  padding: 12px 20px;
+}
+
+/* Text hierarchy */
+.text-display {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  color: var(--color-ink);
+}
+
+.text-h1 {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+
+.text-h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-ink);
+}
+
+.text-h3 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+.text-body {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+
+.text-small {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
+}
+
+.text-caption {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--color-ink-muted);
+}
+
+/* Status badges */
+.badge-fresh {
+  background: var(--color-card-mint);
+  color: var(--color-primary-deep);
+  border-radius: 9999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-soon {
+  background: var(--color-card-banana);
+  color: #B8860B;
+  border-radius: 9999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-urgent {
+  background: var(--color-card-strawberry);
+  color: #D45B5B;
+  border-radius: 9999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

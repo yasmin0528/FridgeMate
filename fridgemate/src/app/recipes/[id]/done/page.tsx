@@ -21,7 +21,26 @@ function DoneInner() {
 
 export default function DonePage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{
+            background:
+              "radial-gradient(circle at 30% 20%, var(--color-card-mint) 0%, var(--color-card-banana) 30%, var(--color-card-strawberry) 60%, var(--color-card-lavender) 100%)",
+          }}
+        >
+          <div
+            className="clay-card px-8 py-6 animate-pulse-soft"
+            style={{ borderRadius: "32px" }}
+          >
+            <div className="text-h2" style={{ color: "var(--color-ink-soft)" }}>
+              加载中...
+            </div>
+          </div>
+        </div>
+      }
+    >
       <DoneInner />
     </Suspense>
   );

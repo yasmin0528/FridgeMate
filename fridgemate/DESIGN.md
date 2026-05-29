@@ -4,53 +4,53 @@ name: Notion-design-analysis
 description: Notion presents itself as the all-in-one workspace through a confident, illustration-rich brand voice — anchored by a deep navy hero band ({colors.brand-navy}) decorated with brand-colored sticky-note dots and mesh wire illustrations, a signature purple pill primary CTA ({colors.primary}), and a rich palette of pastel-tinted feature cards that echo the colorful database properties of the live product. The system uses a Notion-Sans (Inter-based) typeface across every UI surface, anchors a 4-tier pricing comparison (Free / Plus / Business / Enterprise), and presents the live workspace UI mockup directly inside the hero band. Coverage spans homepage, Enterprise, Product AI, Product Agents, Startups, and Pricing surfaces.
 
 colors:
-  primary: "#5645d4"
-  primary-pressed: "#4534b3"
-  primary-deep: "#3a2a99"
-  on-primary: "#ffffff"
-  brand-navy: "#0a1530"
-  brand-navy-deep: "#070f24"
-  brand-navy-mid: "#1a2a52"
-  link-blue: "#0075de"
-  link-blue-pressed: "#005bab"
-  brand-orange: "#dd5b00"
-  brand-orange-deep: "#793400"
-  brand-pink: "#ff64c8"
-  brand-pink-deep: "#a02e6d"
-  brand-purple: "#7b3ff2"
-  brand-purple-300: "#d6b6f6"
-  brand-purple-800: "#391c57"
-  brand-teal: "#2a9d99"
-  brand-green: "#1aae39"
-  brand-yellow: "#f5d75e"
-  brand-brown: "#523410"
-  card-tint-peach: "#ffe8d4"
-  card-tint-rose: "#fde0ec"
-  card-tint-mint: "#d9f3e1"
-  card-tint-lavender: "#e6e0f5"
-  card-tint-sky: "#dcecfa"
-  card-tint-yellow: "#fef7d6"
-  card-tint-yellow-bold: "#f9e79f"
-  card-tint-cream: "#f8f5e8"
-  card-tint-gray: "#f0eeec"
-  canvas: "#ffffff"
-  surface: "#f6f5f4"
-  surface-soft: "#fafaf9"
-  hairline: "#e5e3df"
-  hairline-soft: "#ede9e4"
-  hairline-strong: "#c8c4be"
-  ink-deep: "#000000"
-  ink: "#1a1a1a"
-  charcoal: "#37352f"
-  slate: "#5d5b54"
-  steel: "#787671"
-  stone: "#a4a097"
-  muted: "#bbb8b1"
-  on-dark: "#ffffff"
-  on-dark-muted: "#a4a097"
-  semantic-success: "#1aae39"
-  semantic-warning: "#dd5b00"
-  semantic-error: "#e03131"
+
+  # ===== Brand =====
+  primary: "#7BCF8E"
+  primary-pressed: "#69BD7C"
+  primary-deep: "#57A968"
+  on-primary: "#FFFFFF"
+
+  secondary: "#FFC97A"
+  secondary-soft: "#FFE7BF"
+
+  accent-coral: "#FF9E8A"
+  accent-peach: "#FFD8C2"
+  accent-lavender: "#CDBDFF"
+  accent-sky: "#BFE7FF"
+
+  # ===== Background =====
+  canvas: "#FFFDF8"
+  surface: "#F8F6F1"
+  surface-soft: "#FCFBF8"
+  surface-elevated: "#FFFFFF"
+
+  # ===== Emotional Card Colors =====
+  card-mint: "#E5F7EA"
+  card-peach: "#FFF0E4"
+  card-banana: "#FFF7CC"
+  card-lavender: "#F1EBFF"
+  card-sky: "#E8F6FF"
+  card-strawberry: "#FFE5EA"
+
+  # ===== Text =====
+  ink: "#2B2B2B"
+  ink-soft: "#5F5B53"
+  ink-muted: "#8F8A82"
+  on-dark: "#FFFFFF"
+
+  # ===== Border / Hairline =====
+  hairline: "#ECE7DF"
+  hairline-soft: "#F3EFE8"
+
+  # ===== Semantic =====
+  success: "#7BCF8E"
+  warning: "#FFB84D"
+  error: "#FF7A7A"
+
+  # ===== Shadow Tint =====
+  shadow-mint: "rgba(123, 207, 142, 0.12)"
+  shadow-peach: "rgba(255, 201, 122, 0.16)"
 
 typography:
   hero-display:

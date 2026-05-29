@@ -20,10 +20,7 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         <Providers>
-          {/* The scan page hides the BottomTab and handles its own fullscreen layout,
-              so pb-[60px] is only needed for non-scan pages. We use a CSS approach:
-              scan page has its own full-height fixed layout. */}
-          <div className="flex min-h-screen flex-col pb-[60px] md:pb-0">
+          <div className="flex min-h-screen flex-col pb-[80px] md:pb-0">
             <div className="flex-1">
               {children}
             </div>

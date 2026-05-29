@@ -35,56 +35,18 @@ interface RecognitionDrawerProps {
   hasInvalidRows: boolean;
 }
 
-/* ── Status meta ─────────────────────────────────────────────────────────── */
+/* ── Card tint map by category ──────────────────────────────────────────── */
 
-const STATUS_META: Record<
-  IngredientStatus,
-  { label: string; bg: string; text: string; dot: string }
-> = {
-  fresh: {
-    label: "新鲜",
-    bg: "bg-[#d9f3e1]",
-    text: "text-[#1aae39]",
-    dot: "bg-[#1aae39]",
-  },
-  soon: {
-    label: "临期",
-    bg: "bg-[#fef7d6]",
-    text: "text-[#793400]",
-    dot: "bg-[#dd5b00]",
-  },
-  urgent: {
-    label: "需尽快处理",
-    bg: "bg-[#ffe8d4]",
-    text: "text-[#dd5b00]",
-    dot: "bg-[#e03131]",
-  },
+const CATEGORY_TINT: Record<IngredientCategory, string> = {
+  vegetable: "var(--color-card-mint)",
+  fruit: "var(--color-card-peach)",
+  dairy: "var(--color-card-sky)",
+  meat: "var(--color-card-strawberry)",
+  grain: "var(--color-card-banana)",
+  protein: "var(--color-card-lavender)",
 };
 
-const CATEGORY_OPTIONS: Array<{ value: IngredientCategory; label: string }> = [
-  { value: "vegetable", label: "蔬菜" },
-  { value: "fruit", label: "水果" },
-  { value: "dairy", label: "乳制品" },
-  { value: "meat", label: "肉类" },
-  { value: "grain", label: "主食" },
-  { value: "protein", label: "高蛋白" },
-];
-
-/* ── Status badge ───────────────────────────────────────────────────────── */
-
-function StatusBadge({ status }: { status: IngredientStatus }) {
-  const meta = STATUS_META[status];
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5 text-[11px] font-semibold ${meta.bg} ${meta.text}`}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
-      {meta.label}
-    </span>
-  );
-}
-
-/* ── Single Ingredient Card (color-coded per DESIGN.md) ─────────────────── */
+/* ── Ingredient Card ────────────────────────────────────────────────────── */
 
 function IngredientCard({
   item,
@@ -119,6 +81,17 @@ function IngredientCard({
 
   const shelfLifeDays = item.shelfLife.match(/\d+/)?.[0] ?? "";
 
+  const cardBg = CATEGORY_TINT[item.category] || "var(--color-card-mint)";
+
+  const CATEGORY_OPTIONS: Array<{ value: IngredientCategory; label: string }> = [
+    { value: "vegetable", label: "蔬菜" },
+    { value: "fruit", label: "水果" },
+    { value: "dairy", label: "乳制品" },
+    { value: "meat", label: "肉类" },
+    { value: "grain", label: "主食" },
+    { value: "protein", label: "高蛋白" },
+  ];
+
   return (
     <motion.div
       layout
@@ -126,20 +99,45 @@ function IngredientCard({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, x: -120, height: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="relative rounded-[12px] border border-[#e5e3df] bg-white overflow-hidden"
+      className="relative rounded-[28px] overflow-hidden"
+      style={{
+        backgroundColor: cardBg,
+        boxShadow:
+          "0 2px 8px rgba(43,43,43,0.05), 0 0 0 1px rgba(255,255,255,0.6) inset",
+      }}
     >
       <div className="p-4 space-y-3">
-        {/* Row 1: name input + status badge + delete */}
+        {/* Row 1: name + status badge + delete */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <input
-              value={item.name}
-              onChange={(e) => onUpdate(item.id, "name", e.target.value)}
-              className="w-full rounded-[8px] border border-[#c8c4be] px-3 py-2 text-sm font-medium text-[#1a1a1a] bg-white outline-none focus:border-2 focus:border-[#5645d4]"
-              style={{ fontSize: "14px", lineHeight: 1.5, height: "40px" }}
-            />
+            <div className="relative">
+              <input
+                value={item.name}
+                onChange={(e) => onUpdate(item.id, "name", e.target.value)}
+                className="w-full rounded-2xl px-4 py-2.5 text-sm font-medium outline-none transition-all"
+                style={{
+                  fontSize: "14px",
+                  lineHeight: 1.5,
+                  color: "var(--color-ink)",
+                  backgroundColor: "var(--color-surface-elevated)",
+                  border: "1.5px solid var(--color-hairline)",
+                  boxShadow:
+                    "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--color-primary)";
+                  e.target.style.boxShadow =
+                    "0 0 0 3px rgba(123, 207, 142, 0.15), 0 1px 4px rgba(43,43,43,0.04)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--color-hairline)";
+                  e.target.style.boxShadow =
+                    "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset";
+                }}
+              />
+            </div>
             {(item.source || typeof item.confidence === "number") && (
-              <p className="mt-1 text-[11px] text-[#787671]">
+              <p className="mt-1.5 text-caption" style={{ color: "var(--color-ink-muted)" }}>
                 来源: {item.source || "待确认"} · 置信度:{" "}
                 {typeof item.confidence === "number"
                   ? `${Math.round(item.confidence * 100)}%`
@@ -148,11 +146,32 @@ function IngredientCard({
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <StatusBadge status={item.status} />
+            {/* Status badge using globals.css classes */}
+            <span
+              className={
+                item.status === "fresh"
+                  ? "badge-fresh"
+                  : item.status === "soon"
+                    ? "badge-soon"
+                    : "badge-urgent"
+              }
+            >
+              {item.status === "fresh"
+                ? "\u65B0\u9C9C"
+                : item.status === "soon"
+                  ? "\u4E34\u671F"
+                  : "\u7D27\u6025"}
+            </span>
             <button
               type="button"
               onClick={() => setShowDeleteConfirm(true)}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[#a4a097] bg-white/60 hover:text-[#e03131] hover:bg-[#ffe8d4] transition-colors"
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+              style={{
+                color: "var(--color-ink-muted)",
+                backgroundColor: "rgba(255,255,255,0.6)",
+                backdropFilter: "blur(4px)",
+                boxShadow: "0 1px 4px rgba(43,43,43,0.04)",
+              }}
               aria-label={`删除 ${item.name}`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -167,30 +186,43 @@ function IngredientCard({
         {/* Row 2: quantity stepper + shelf life */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-medium text-[#5d5b54] mb-1">
+            <label className="text-caption block mb-1.5 font-semibold" style={{ color: "var(--color-ink-soft)" }}>
               数量
             </label>
-            <div className="flex items-center rounded-[8px] border border-[#c8c4be] bg-white overflow-hidden">
+            <div
+              className="flex items-center rounded-2xl overflow-hidden"
+              style={{
+                backgroundColor: "var(--color-surface-elevated)",
+                border: "1.5px solid var(--color-hairline)",
+                boxShadow:
+                  "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset",
+              }}
+            >
               <button
                 type="button"
                 onClick={handleQtyMinus}
-                className="w-9 h-10 flex items-center justify-center text-[#787671] hover:bg-[#f6f5f4] active:bg-[#e5e3df] transition-colors"
+                className="w-10 h-[42px] flex items-center justify-center transition-colors"
+                style={{ color: "var(--color-ink-muted)" }}
                 aria-label="减少数量"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                   <path d="M5 12h14" />
                 </svg>
               </button>
-              <span className="flex-1 text-center text-sm font-semibold text-[#1a1a1a] min-w-[3rem] bg-white">
+              <span
+                className="flex-1 text-center text-sm font-semibold min-w-[3rem] leading-[42px]"
+                style={{ color: "var(--color-ink)", backgroundColor: "var(--color-surface-elevated)" }}
+              >
                 {item.amount}
               </span>
               <button
                 type="button"
                 onClick={handleQtyPlus}
-                className="w-9 h-10 flex items-center justify-center text-[#787671] hover:bg-[#f6f5f4] active:bg-[#e5e3df] transition-colors"
+                className="w-10 h-[42px] flex items-center justify-center transition-colors"
+                style={{ color: "var(--color-ink-muted)" }}
                 aria-label="增加数量"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                   <path d="M12 5v14" />
                   <path d="M5 12h14" />
                 </svg>
@@ -199,7 +231,7 @@ function IngredientCard({
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium text-[#5d5b54] mb-1">
+            <label className="text-caption block mb-1.5 font-semibold" style={{ color: "var(--color-ink-soft)" }}>
               保质期
             </label>
             <div className="relative">
@@ -209,10 +241,31 @@ function IngredientCard({
                 inputMode="decimal"
                 min="0"
                 type="number"
-                className="w-full h-10 rounded-[8px] border border-[#c8c4be] bg-white px-3 pr-10 text-sm font-semibold text-[#1a1a1a] outline-none focus:border-2 focus:border-[#5645d4]"
-                style={{ fontSize: "14px", lineHeight: 1.5 }}
+                className="w-full h-[42px] rounded-2xl px-4 text-sm font-semibold outline-none transition-all"
+                style={{
+                  fontSize: "14px",
+                  lineHeight: 1.5,
+                  color: "var(--color-ink)",
+                  backgroundColor: "var(--color-surface-elevated)",
+                  border: "1.5px solid var(--color-hairline)",
+                  boxShadow:
+                    "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--color-primary)";
+                  e.target.style.boxShadow =
+                    "0 0 0 3px rgba(123, 207, 142, 0.15), 0 1px 4px rgba(43,43,43,0.04)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--color-hairline)";
+                  e.target.style.boxShadow =
+                    "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset";
+                }}
               />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#787671]">
+              <span
+                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-caption"
+                style={{ color: "var(--color-ink-muted)" }}
+              >
                 天
               </span>
             </div>
@@ -226,7 +279,14 @@ function IngredientCard({
             onChange={(e) =>
               onUpdate(item.id, "category", e.target.value as IngredientCategory)
             }
-            className="flex-1 h-9 rounded-[8px] border border-[#c8c4be] bg-white px-2 text-xs font-medium text-[#37352f] outline-none focus:border-2 focus:border-[#5645d4]"
+            className="flex-1 h-[38px] rounded-2xl px-3 text-xs font-medium outline-none transition-all appearance-none"
+            style={{
+              color: "var(--color-ink-soft)",
+              backgroundColor: "var(--color-surface-elevated)",
+              border: "1.5px solid var(--color-hairline)",
+              boxShadow:
+                "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset",
+            }}
           >
             {CATEGORY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -234,16 +294,42 @@ function IngredientCard({
               </option>
             ))}
           </select>
-          <select
-            value={item.zone}
-            onChange={(e) =>
-              onUpdate(item.id, "zone", e.target.value as IngredientZone)
-            }
-            className="w-20 h-9 rounded-[8px] border border-[#c8c4be] bg-white px-2 text-xs font-medium text-[#37352f] outline-none focus:border-2 focus:border-[#5645d4]"
+          <div
+            className="flex rounded-2xl overflow-hidden shrink-0"
+            style={{
+              backgroundColor: "var(--color-surface-elevated)",
+              border: "1.5px solid var(--color-hairline)",
+            }}
           >
-            <option value="fridge">冷藏</option>
-            <option value="freeze">冷冻</option>
-          </select>
+            <button
+              type="button"
+              onClick={() => onUpdate(item.id, "zone", "fridge")}
+              className="px-3.5 h-[38px] text-xs font-medium transition-all"
+              style={{
+                color: item.zone === "fridge" ? "var(--color-primary-deep)" : "var(--color-ink-muted)",
+                backgroundColor:
+                  item.zone === "fridge"
+                    ? "var(--color-card-mint)"
+                    : "transparent",
+              }}
+            >
+              冷藏
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdate(item.id, "zone", "freeze")}
+              className="px-3.5 h-[38px] text-xs font-medium transition-all"
+              style={{
+                color: item.zone === "freeze" ? "var(--color-primary-deep)" : "var(--color-ink-muted)",
+                backgroundColor:
+                  item.zone === "freeze"
+                    ? "var(--color-card-sky)"
+                    : "transparent",
+              }}
+            >
+              冷冻
+            </button>
+          </div>
         </div>
       </div>
 
@@ -254,26 +340,36 @@ function IngredientCard({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-[12px] z-10"
+            className="absolute inset-0 flex items-center justify-center rounded-[28px] z-10"
+            style={{
+              backgroundColor: "rgba(43, 43, 43, 0.25)",
+              backdropFilter: "blur(4px)",
+            }}
             onClick={() => setShowDeleteConfirm(false)}
           >
             <div
-              className="bg-white rounded-[12px] p-4 w-52 text-center shadow-lg"
+              className="rounded-[20px] p-5 w-52 text-center"
+              style={{
+                backgroundColor: "var(--color-surface-elevated)",
+                boxShadow:
+                  "0 8px 24px rgba(43,43,43,0.12), 0 0 0 1px rgba(255,255,255,0.6) inset",
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              <p className="text-sm font-semibold text-[#1a1a1a] mb-3">
+              <p className="text-h3 mb-4" style={{ color: "var(--color-ink)" }}>
                 确认删除此食材？
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => { onDelete(item.id); setShowDeleteConfirm(false); }}
-                  className="flex-1 h-9 rounded-[8px] bg-[#e03131] text-sm font-medium text-white"
+                  className="btn-primary flex-1 h-10 text-sm"
+                  style={{ backgroundColor: "var(--color-error)" }}
                 >
                   删除
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 h-9 rounded-[8px] bg-[#f6f5f4] text-sm font-medium text-[#5d5b54]"
+                  className="btn-secondary flex-1 h-10 text-sm"
                 >
                   取消
                 </button>
@@ -288,6 +384,24 @@ function IngredientCard({
 
 /* ── Message Banner ─────────────────────────────────────────────────────── */
 
+const MESSAGE_TINT: Record<string, { bg: string; icon: string; label: string }> = {
+  info: {
+    bg: "var(--color-card-banana)",
+    icon: "\uD83D\uDCE2",
+    label: "提示",
+  },
+  success: {
+    bg: "var(--color-card-mint)",
+    icon: "\u2714\uFE0F",
+    label: "太棒了",
+  },
+  error: {
+    bg: "var(--color-card-strawberry)",
+    icon: "\u26A0\uFE0F",
+    label: "哎呀",
+  },
+};
+
 function MessageBanner({
   message,
   type,
@@ -295,20 +409,28 @@ function MessageBanner({
   message: string;
   type: "info" | "success" | "error";
 }) {
-  const bgMap = {
-    info: "bg-[#ffe8d4] text-[#793400]",
-    success: "bg-[#d9f3e1] text-[#1aae39]",
-    error: "bg-[#ffe8d4] text-[#e03131]",
-  };
+  const meta = MESSAGE_TINT[type];
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className={`rounded-[8px] px-3 py-2.5 text-xs font-medium ${bgMap[type]}`}
+      className="rounded-2xl px-4 py-3 flex items-start gap-2.5"
+      style={{
+        backgroundColor: meta.bg,
+        boxShadow: "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.4) inset",
+      }}
     >
-      {message}
+      <span className="text-base leading-none mt-0.5 shrink-0">{meta.icon}</span>
+      <div>
+        <p className="text-caption font-semibold mb-0.5" style={{ color: "var(--color-ink-soft)" }}>
+          {meta.label}
+        </p>
+        <p className="text-small font-medium" style={{ color: "var(--color-ink)" }}>
+          {message}
+        </p>
+      </div>
     </motion.div>
   );
 }
@@ -345,7 +467,8 @@ export const RecognitionDrawer = React.memo(function RecognitionDrawer({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-40 bg-black/40"
+            className="fixed inset-0 z-40"
+            style={{ backgroundColor: "rgba(43, 43, 43, 0.3)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -353,14 +476,18 @@ export const RecognitionDrawer = React.memo(function RecognitionDrawer({
             onClick={onClose}
           />
 
-          {/* Drawer */}
+          {/* Drawer — claymorphism card */}
           <motion.div
-            className="fixed bottom-0 left-0 right-0 z-50 flex flex-col bg-white rounded-t-[20px]"
+            className="fixed bottom-0 left-0 right-0 z-50 flex flex-col"
             style={{
               maxHeight: "85vh",
               maxWidth: 414,
               margin: "0 auto",
-              boxShadow: "rgba(15, 15, 15, 0.16) 0px -8px 32px -4px",
+              backgroundColor: "var(--color-canvas)",
+              borderTopLeftRadius: 32,
+              borderTopRightRadius: 32,
+              boxShadow:
+                "0 -8px 32px rgba(43,43,43,0.1), 0 0 0 1px rgba(255,255,255,0.8) inset",
             }}
             initial={{ y: "100%" }}
             animate={{ y: dragY }}
@@ -373,22 +500,31 @@ export const RecognitionDrawer = React.memo(function RecognitionDrawer({
             onDragEnd={handleDragEnd}
           >
             {/* Handle bar */}
-            <div className="flex justify-center pt-3 pb-2 shrink-0">
-              <div className="w-10 h-1 rounded-full bg-[#c8c4be]" />
+            <div className="flex justify-center pt-4 pb-2 shrink-0">
+              <div
+                className="w-10 h-1.5 rounded-full"
+                style={{ backgroundColor: "var(--color-hairline)" }}
+              />
             </div>
 
-            {/* Header — NO add button, just title */}
-            <div className="px-5 pb-3 shrink-0 border-b border-[#ede9e4]">
-              <p className="text-xs font-semibold text-[#5645d4]">
+            {/* Header */}
+            <div className="px-5 pb-3 shrink-0" style={{ borderBottom: "1px solid var(--color-hairline-soft)" }}>
+              <p className="text-caption font-semibold" style={{ color: "var(--color-primary-deep)" }}>
                 识别结果
               </p>
-              <h2 className="text-base font-semibold text-[#1a1a1a] mt-0.5">
+              <h2 className="text-h3 mt-0.5" style={{ color: "var(--color-ink)" }}>
                 修改、删除或补充食材
               </h2>
             </div>
 
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3">
+            <div
+              className="flex-1 overflow-y-auto px-5 py-3 space-y-3"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "var(--color-hairline) transparent",
+              }}
+            >
               <AnimatePresence mode="popLayout">
                 {message && (
                   <MessageBanner key="message" message={message} type={messageType} />
@@ -411,31 +547,53 @@ export const RecognitionDrawer = React.memo(function RecognitionDrawer({
                     animate={{ opacity: 1 }}
                     className="py-12 text-center"
                   >
-                    <p className="text-sm font-medium text-[#787671]">
+                    <motion.div
+                      className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                      style={{ backgroundColor: "var(--color-card-banana)" }}
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                    </motion.div>
+                    <p className="text-body font-medium mb-4" style={{ color: "var(--color-ink-soft)" }}>
                       暂无识别结果
                     </p>
                     <button
                       type="button"
                       onClick={onAdd}
-                      className="mt-4 h-10 px-4 rounded-[8px] bg-[#5645d4] text-sm font-medium text-white"
+                      className="btn-primary"
                     >
                       添加第一个食材
                     </button>
                   </motion.div>
                 )}
 
-                {/* ONLY dotted "添加新食材" entry — NO header add button */}
+                {/* Add new ingredient button */}
                 {ingredients.length > 0 && (
                   <motion.button
                     key="add-button"
                     type="button"
                     onClick={onAdd}
-                    className="w-full rounded-[12px] border-2 border-dashed border-[#c8c4be] py-4 flex items-center justify-center gap-2 text-sm font-medium text-[#787671] hover:text-[#5645d4] hover:border-[#5645d4] transition-colors"
+                    className="w-full rounded-[28px] py-4 flex items-center justify-center gap-2 text-sm font-medium transition-all"
+                    style={{
+                      color: "var(--color-ink-muted)",
+                      border: "2px dashed var(--color-hairline)",
+                      backgroundColor: "transparent",
+                    }}
                     whileTap={{ scale: 0.98 }}
+                    whileHover={{
+                      color: "var(--color-primary-deep)",
+                      borderColor: "var(--color-primary)",
+                      backgroundColor: "var(--color-card-mint)",
+                    }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                       <path d="M12 5v14" />
                       <path d="M5 12h14" />
                     </svg>
@@ -446,24 +604,41 @@ export const RecognitionDrawer = React.memo(function RecognitionDrawer({
             </div>
 
             {/* Bottom action bar */}
-            <div className="px-5 py-4 border-t border-[#ede9e4] bg-white rounded-b-[20px] shrink-0">
-              <div className="mb-3 rounded-[8px] bg-[#f6f5f4] p-3">
+            <div
+              className="px-5 py-4 shrink-0"
+              style={{
+                borderTop: "1px solid var(--color-hairline-soft)",
+                backgroundColor: "var(--color-canvas)",
+                borderBottomLeftRadius: 32,
+                borderBottomRightRadius: 32,
+              }}
+            >
+              <div
+                className="rounded-2xl p-4 mb-3"
+                style={{
+                  backgroundColor: "var(--color-surface)",
+                  boxShadow:
+                    "0 1px 4px rgba(43,43,43,0.04), 0 0 0 1px rgba(255,255,255,0.6) inset",
+                }}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-[#787671]">
+                    <p className="text-caption font-semibold" style={{ color: "var(--color-ink-muted)" }}>
                       {hasInvalidRows ? "需补全" : "待同步"}
                     </p>
-                    <p className="text-sm font-semibold text-[#37352f] mt-0.5">
+                    <p className="text-small font-semibold mt-0.5" style={{ color: "var(--color-ink)" }}>
                       {hasInvalidRows
                         ? "请补全食材名称、数量和保质期"
-                        : `确认后同步到冰箱库存`}
+                        : "确认后同步到冰箱库存"}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-semibold text-[#1a1a1a]">
+                    <p className="text-h2" style={{ color: "var(--color-primary-deep)" }}>
                       {ingredients.length}
                     </p>
-                    <p className="text-xs text-[#787671]">识别食材</p>
+                    <p className="text-caption" style={{ color: "var(--color-ink-muted)" }}>
+                      识别食材
+                    </p>
                   </div>
                 </div>
               </div>
@@ -472,7 +647,10 @@ export const RecognitionDrawer = React.memo(function RecognitionDrawer({
                 type="button"
                 onClick={onConfirmSync}
                 disabled={ingredients.length === 0}
-                className="w-full h-11 rounded-[8px] text-sm font-medium text-white bg-[#5645d4] disabled:bg-[#e5e3df] disabled:text-[#bbb8b1] transition-colors"
+                className="btn-primary w-full h-12 text-base"
+                style={{
+                  opacity: ingredients.length === 0 ? 0.4 : 1,
+                }}
               >
                 确认同步至冰箱
               </button>

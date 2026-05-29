@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useFridgeStore } from "@/store/fridgeStore";
 import { MOCK_INGREDIENTS } from "@/mock/ingredients";
 import { CameraView } from "@/components/scan/CameraView";
@@ -103,6 +104,69 @@ async function optimizeImageForRecognition(file: File) {
   const safeName = file.name.replace(/\.[^.]+$/, "") || "fridge-photo";
   return new File([blob], `${safeName}.jpg`, { type: "image/jpeg", lastModified: Date.now() });
 }
+
+/* ── Decorative floating icons ──────────────────────────────────────────── */
+
+function FloatingSparkles() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <motion.div
+        className="absolute w-3 h-3 rounded-full"
+        style={{
+          background: "var(--color-card-peach)",
+          top: "10%",
+          left: "12%",
+        }}
+        animate={{ y: [0, -8, 0], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute w-2 h-2 rounded-full"
+        style={{
+          background: "var(--color-card-sky)",
+          top: "18%",
+          right: "15%",
+        }}
+        animate={{ y: [0, -6, 0], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+      />
+      <motion.div
+        className="absolute w-4 h-4 rounded-full"
+        style={{
+          background: "var(--color-card-banana)",
+          bottom: "25%",
+          left: "8%",
+        }}
+        animate={{ y: [0, -10, 0], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      />
+      <motion.div
+        className="absolute w-2.5 h-2.5 rounded-full"
+        style={{
+          background: "var(--color-card-lavender)",
+          bottom: "20%",
+          right: "10%",
+        }}
+        animate={{ y: [0, -7, 0], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+      />
+    </div>
+  );
+}
+
+/* ── Message Toast ──────────────────────────────────────────────────────── */
+
+const TOAST_BG: Record<string, string> = {
+  success: "var(--color-card-mint)",
+  error: "var(--color-card-strawberry)",
+  info: "var(--color-card-banana)",
+};
+
+const TOAST_ICON: Record<string, string> = {
+  success: "\u2714\uFE0F",
+  error: "\u26A0\uFE0F",
+  info: "\uD83D\uDCE2",
+};
 
 /* ── Page Component ─────────────────────────────────────────────────────── */
 
@@ -287,7 +351,7 @@ export default function ScanPage() {
     setDrawerOpen(false);
     setStatus("idle");
     setProgress(0);
-    setMessage(`同步成功：已更新冰箱库存。（已同步 ${matched.length} 项）`);
+    setMessage(`\u540C\u6B65\u6210\u529F\uFF1A\u5DF2\u66F4\u65B0\u51B0\u7BB1\u5E93\u5B58\u3002\uFF08\u5DF2\u540C\u6B65 ${matched.length} \u9879\uFF09`);
     setMessageType("success");
     lastFileRef.current = null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -310,9 +374,15 @@ export default function ScanPage() {
   }, [router]);
 
   return (
-    <main className="fixed inset-0 bg-[#e8e6e1] text-[#1a1a1a] flex flex-col z-50">
+    <main
+      className="fixed inset-0 flex flex-col z-50"
+      style={{ backgroundColor: "var(--color-canvas)" }}
+    >
       {/* Fullscreen camera section — takes entire viewport */}
       <section className="flex-1 relative">
+        {/* Decorative floating sparkles */}
+        {status === "idle" && <FloatingSparkles />}
+
         <CameraView
           status={status}
           progress={progress}
@@ -325,23 +395,40 @@ export default function ScanPage() {
         />
       </section>
 
-      {/* Message bar — overlaid at bottom above control panel */}
-      {message && (
-        <div className="fixed top-4 left-4 right-4 z-50 max-w-[414px] mx-auto pointer-events-none">
-          <div
-            className={`rounded-[12px] p-4 text-xs font-medium ${
-              messageType === "success"
-                ? "bg-[#d9f3e1] text-[#1aae39]"
-                : messageType === "error"
-                  ? "bg-[#ffe8d4] text-[#e03131]"
-                  : "bg-[#fef7d6] text-[#793400]"
-            }`}
+      {/* Message toast — overlaid at top */}
+      <AnimatePresence>
+        {message && (
+          <motion.div
+            className="fixed top-5 left-4 right-4 z-50"
+            style={{ maxWidth: 414, margin: "0 auto" }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
-            <p className="text-xs font-semibold opacity-70 mb-1">提示</p>
-            <p className="text-sm">{message}</p>
-          </div>
-        </div>
-      )}
+            <div
+              className="rounded-2xl px-4 py-3 shadow-lg flex items-start gap-3"
+              style={{
+                backgroundColor: TOAST_BG[messageType],
+                boxShadow:
+                  "0 4px 16px rgba(43,43,43,0.08), 0 0 0 1px rgba(255,255,255,0.6) inset",
+              }}
+            >
+              <span className="text-lg leading-none mt-0.5 shrink-0">
+                {TOAST_ICON[messageType]}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold opacity-60 mb-0.5" style={{ color: "var(--color-ink-soft)" }}>
+                  {messageType === "success" ? "太棒了" : messageType === "error" ? "哎呀" : "提示"}
+                </p>
+                <p className="text-sm font-medium" style={{ color: "var(--color-ink)" }}>
+                  {message}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Recognition Drawer */}
       <RecognitionDrawer

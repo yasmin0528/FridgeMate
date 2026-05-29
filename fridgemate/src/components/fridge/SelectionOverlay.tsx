@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React from "react";
+import { motion } from "framer-motion";
 import { Food } from "@/types/food";
 import { useFridgeStore } from "@/store/fridgeStore";
 
@@ -16,14 +17,10 @@ export function SelectionOverlay({ food, open, onClose }: SelectionOverlayProps)
   const isSelected = (f: Food) =>
     selectedIds.includes(f.ingredientId ?? String(f.id));
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = () => {
     if (!food) return;
     toggleSelect(food.ingredientId ?? String(food.id));
-  }, [food, toggleSelect]);
-
-  const handleConfirm = useCallback(() => {
-    onClose();
-  }, [onClose]);
+  };
 
   if (!open || !food) return null;
 
@@ -33,77 +30,41 @@ export function SelectionOverlay({ food, open, onClose }: SelectionOverlayProps)
       role="dialog"
       aria-modal="true"
     >
-      <div
-        className="absolute inset-0 bg-black/40"
+      <motion.div
+        className="absolute inset-0 bg-black/30"
         onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       />
 
-      <div
-        className="relative z-10 w-full rounded-t-[12px] bg-white p-[24px]"
-        style={{
-          boxShadow: "rgba(15, 15, 15, 0.16) 0px -8px 32px -8px",
-        }}
+      <motion.div
+        className="relative z-10 w-full max-w-[414px] bg-surface-elevated rounded-t-[32px] p-6"
+        initial={{ y: 200 }}
+        animate={{ y: 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 300 }}
       >
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between mb-4">
           <div>
-            <p
-              className="text-sm font-semibold text-[#1a1a1a]"
-              style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3 }}
-            >
-              {food.name}
-            </p>
-            <p
-              className="mt-1 text-sm text-[#5d5b54]"
-              style={{ fontSize: "14px", lineHeight: 1.5 }}
-            >
-              类别：{food.category}
-            </p>
-          </div>
-          <div
-            className="text-sm text-[#5d5b54]"
-            style={{ fontSize: "14px", lineHeight: 1.5 }}
-          >
-            剩余：{food.count} 份
+            <p className="text-h3 text-ink">{food.name}</p>
+            <p className="text-small mt-1">类别：{food.category} · 剩余：{food.count} 份</p>
           </div>
         </div>
 
-        <div className="mt-4 space-y-3">
-          <p
-            className="text-sm text-[#787671]"
-            style={{ fontSize: "14px", lineHeight: 1.5 }}
+        <div className="flex gap-3">
+          <button
+            onClick={handleToggle}
+            className="flex-1 btn-primary"
           >
-            保质期：{food.expire}
-          </p>
-
-          <div className="flex gap-2">
-            <button
-              onClick={handleToggle}
-              className={`flex-1 rounded-[8px] px-4 py-2.5 text-sm font-medium ${
-                isSelected(food)
-                  ? "bg-[#1a1a1a] text-white"
-                  : "bg-white border border-[#c8c4be] text-[#1a1a1a]"
-              }`}
-              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
-            >
-              {isSelected(food) ? "已选中" : "选择食材"}
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="flex-1 rounded-[8px] border border-[#c8c4be] px-4 py-2.5 text-sm font-medium text-[#1a1a1a]"
-              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
-            >
-              关闭
-            </button>
-          </div>
-
-          <div
-            className="text-center text-xs text-[#a4a097]"
-            style={{ fontSize: "12px", lineHeight: 1.4 }}
+            {isSelected(food) ? "已选中 ✓" : "选择食材"}
+          </button>
+          <button
+            onClick={onClose}
+            className="flex-1 btn-secondary"
           >
-            点击空白处关闭
-          </div>
+            关闭
+          </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

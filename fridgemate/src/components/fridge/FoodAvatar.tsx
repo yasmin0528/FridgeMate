@@ -11,16 +11,21 @@ interface FoodAvatarProps {
 }
 
 const SIZE_CLASSES = {
-  sm: "text-lg",
+  sm: "text-xl",
   md: "text-3xl",
   lg: "text-5xl",
 };
 
-/**
- * FoodAvatar 组件
- * 职责：负责食材图标逻辑
- * 特点：使用 useMemo 缓存 emoji 计算，避免重复渲染
- */
+const BG_CLASSES: Record<string, string> = {
+  vegetable: "bg-card-mint",
+  fruit: "bg-card-peach",
+  meat: "bg-card-strawberry",
+  drink: "bg-card-sky",
+  grain: "bg-card-banana",
+  protein: "bg-card-lavender",
+  seafood: "bg-card-sky",
+};
+
 export const FoodAvatar = React.memo(function FoodAvatar({
   name,
   category,
@@ -31,9 +36,15 @@ export const FoodAvatar = React.memo(function FoodAvatar({
     [name, category]
   );
 
+  const bgClass = BG_CLASSES[category] || "bg-surface";
+
   return (
     <div
-      className={`flex items-center justify-center ${SIZE_CLASSES[size]}`}
+      className={`flex items-center justify-center rounded-2xl ${bgClass} ${SIZE_CLASSES[size]} floating-element`}
+      style={{
+        width: size === "sm" ? 36 : size === "md" ? 52 : 80,
+        height: size === "sm" ? 36 : size === "md" ? 52 : 80,
+      }}
       role="img"
       aria-label={name}
     >

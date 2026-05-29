@@ -6,6 +6,7 @@ import {
   useReducer,
   useEffect,
   useMemo,
+  useCallback,
   ReactNode,
 } from "react";
 import type { Ingredient } from "@/types";
@@ -18,8 +19,11 @@ export type InventoryCategory =
   | "fruit"
   | "dairy"
   | "meat"
+  | "drink"
+  | "seafood"
   | "grain"
-  | "protein";
+  | "protein"
+  | "other";
 
 export interface InventoryItem {
   ingredientId: string;
@@ -196,19 +200,49 @@ export function FridgeProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
+  const addItems = useCallback((items: InventoryItemInput[]) => {
+    dispatch({ type: "ADD_ITEMS", items });
+  }, []);
+
+  const updateItem = useCallback((item: InventoryItemInput) => {
+    dispatch({ type: "UPDATE_ITEM", item });
+  }, []);
+
+  const removeItem = useCallback((id: string) => {
+    dispatch({ type: "REMOVE_ITEM", ingredientId: id });
+  }, []);
+
+  const toggleSelect = useCallback((id: string) => {
+    dispatch({ type: "TOGGLE_SELECT", ingredientId: id });
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    dispatch({ type: "CLEAR_SELECTION" });
+  }, []);
+
+  const selectedSet = useMemo(() => new Set(state.selectedIds), [state.selectedIds]);
+
   const value: FridgeContextValue = useMemo(
     () => ({
       inventory: state.inventory,
       selectedIds: state.selectedIds,
-      selectedSet: new Set(state.selectedIds),
-      addItems: (items) => dispatch({ type: "ADD_ITEMS", items }),
-      updateItem: (item) => dispatch({ type: "UPDATE_ITEM", item }),
-      removeItem: (id) => dispatch({ type: "REMOVE_ITEM", ingredientId: id }),
-      toggleSelect: (id) =>
-        dispatch({ type: "TOGGLE_SELECT", ingredientId: id }),
-      clearSelection: () => dispatch({ type: "CLEAR_SELECTION" }),
+      selectedSet,
+      addItems,
+      updateItem,
+      removeItem,
+      toggleSelect,
+      clearSelection,
     }),
-    [state],
+    [
+      state.inventory,
+      state.selectedIds,
+      selectedSet,
+      addItems,
+      updateItem,
+      removeItem,
+      toggleSelect,
+      clearSelection,
+    ],
   );
 
   return (

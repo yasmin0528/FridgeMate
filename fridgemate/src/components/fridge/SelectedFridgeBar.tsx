@@ -3,7 +3,6 @@
 import React, { useCallback } from "react";
 import { motion } from "framer-motion";
 import { useFridgeStore } from "@/store/fridgeStore";
-import { FOODS_DATA } from "@/data/foods";
 import { INGREDIENT_BY_ID } from "@/mock/ingredients";
 import { useRouter } from "next/navigation";
 
@@ -19,96 +18,82 @@ export const SelectedFridgeBar = React.memo(function SelectedFridgeBar({
   const { selectedIds, toggleSelect, clearSelection } = useFridgeStore();
   const router = useRouter();
 
-  const handleToggle = useCallback(
-    (id: string) => {
-      toggleSelect(id);
-    },
-    [toggleSelect]
-  );
-
   const handleConfirm = useCallback(() => {
     if (selectedIds.length === 0) return;
     onClose();
     router.push("/recipes");
-  }, [selectedIds.length, onClose, router]);
+  }, [onClose, router, selectedIds.length]);
 
   if (!open) return null;
 
   return (
     <motion.div
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e3df] z-40"
-      style={{ boxShadow: "rgba(15, 15, 15, 0.16) 0px -4px 16px -4px" }}
+      className="fixed bottom-0 left-0 right-0 z-40"
+      style={{
+        background: "rgba(255, 253, 248, 0.95)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        boxShadow: "0 -4px 24px rgba(43, 43, 43, 0.08)",
+      }}
       initial={{ y: 100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.28 }}
+      transition={{ duration: 0.28, ease: "easeOut" }}
     >
-      <div className="px-4 py-3">
-        <div className="mb-2 flex items-center justify-between">
-          <p
-            className="text-sm font-medium text-[#37352f]"
-            style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
-          >
+      <div className="px-5 py-4 max-w-[414px] mx-auto">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-small font-semibold text-ink">
             已选择 {selectedIds.length} 件食材
           </p>
           <div className="flex gap-2">
             <button
-              onClick={() => clearSelection()}
-              className="rounded-[8px] px-3 py-1.5 text-sm font-medium text-[#5d5b54] bg-[#f6f5f4] border border-[#e5e3df]"
-              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
+              onClick={onClose}
+              className="btn-ghost text-caption"
             >
-              清空
+              收起
             </button>
             <button
-              onClick={onClose}
-              className="rounded-[8px] px-3 py-1.5 text-sm font-medium text-[#5d5b54] bg-[#f6f5f4] border border-[#e5e3df]"
-              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.3 }}
+              onClick={() => clearSelection()}
+              className="btn-ghost text-caption"
             >
-              关闭
+              清空
             </button>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-3">
-          {selectedIds.map((id) => {
-            const f = FOODS_DATA.find((x) => x.id === id);
-            if (f) {
+        {selectedIds.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {selectedIds.map((id) => {
+              const ing = INGREDIENT_BY_ID.get(id);
+              if (!ing) return null;
               return (
-                <div
+                <button
                   key={id}
-                  className="rounded-[6px] bg-[#e6e0f5] px-3 py-1 text-sm font-medium text-[#391c57]"
-                  style={{ fontSize: "13px", fontWeight: 600, lineHeight: 1.4 }}
+                  onClick={() => toggleSelect(id)}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all"
+                  style={{
+                    backgroundColor: "var(--color-card-lavender)",
+                    color: "var(--color-ink)",
+                  }}
                 >
-                  {f.name}
-                </div>
+                  <span>{ing.emoji}</span>
+                  <span>{ing.name}</span>
+                  <span className="text-ink-muted">✕</span>
+                </button>
               );
-            }
-            const ing = INGREDIENT_BY_ID.get(id);
-            if (ing) {
-              return (
-                <div
-                  key={id}
-                  className="rounded-[6px] bg-[#e6e0f5] px-3 py-1 text-sm font-medium text-[#391c57]"
-                  style={{ fontSize: "13px", fontWeight: 600, lineHeight: 1.4 }}
-                >
-                  {ing.name}
-                </div>
-              );
-            }
-            return null;
-          })}
-        </div>
+            })}
+          </div>
+        )}
 
         <button
           onClick={handleConfirm}
-          className="w-full rounded-[8px] py-2.5 px-4 text-sm font-medium text-white"
+          disabled={selectedIds.length === 0}
+          className="w-full btn-primary text-[15px] font-medium"
           style={{
-            backgroundColor: "#5645d4",
-            fontSize: "14px",
-            fontWeight: 500,
-            lineHeight: 1.3,
+            opacity: selectedIds.length === 0 ? 0.5 : 1,
+            cursor: selectedIds.length === 0 ? "not-allowed" : "pointer",
           }}
         >
-          确认食材
+          看看能做什么菜
         </button>
       </div>
     </motion.div>

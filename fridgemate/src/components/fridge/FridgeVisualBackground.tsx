@@ -6,157 +6,137 @@ import { Food } from "@/types/food";
 import { FoodCard } from "./FoodCard";
 import { useFridgeStore } from "@/store/fridgeStore";
 
-/* ═══════════════════════════════════════════════════════════════════════════
- *  FridgeVisualBackground.tsx
- *
- *  A photorealistic fridge interior with two temperature zones:
- *    Freezer (–18°C 冷冻层)
- *    Fridge  ( 4°C  冷藏层)
- *
- *  Inside the fridge layer, foods are arranged on nested shelves/areas
- *  by category so the fridge looks organized, but it's all one zone.
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Zone definitions ─────────────────────────────────────────────────── */
-interface ZoneDef {
-  key: string;
-  label: string;
-  temp: string;
-  zone: "fridge" | "freeze";
-  accent: string;
-  heightFraction: number;
-}
-
-const ZONES: ZoneDef[] = [
-  {
-    key: "freezer",
-    label: "冷冻层",
-    temp: "-18°C",
-    zone: "freeze",
-    accent: "#5b9bd5",
-    heightFraction: 0.30,
-  },
-  {
-    key: "fridge",
-    label: "冷藏层",
-    temp: "4°C",
-    zone: "fridge",
-    accent: "#70ad47",
-    heightFraction: 0.70,
-  },
-];
-
-/* ── Food → zone assignment ──────────────────────────────────────────── */
-
-function zoneKeyForFood(food: Food): string {
-  return food.zone === "freeze" ? "freezer" : "fridge";
-}
-
-function partitionByZone(foods: Food[]): Map<string, Food[]> {
-  const map = new Map<string, Food[]>();
-  for (const z of ZONES) map.set(z.key, []);
-  for (const f of foods) {
-    map.get(zoneKeyForFood(f))!.push(f);
-  }
-  return map;
-}
-
 /* ── Props ────────────────────────────────────────────────────────────── */
 interface FridgeVisualBackgroundProps {
   foods: Food[];
-  onFoodClick?: (food: Food) => void;
   onSelect?: (food: Food) => void;
   onEdit?: (food: Food) => void;
   onDelete?: (food: Food) => void;
   className?: string;
 }
 
-/* ── Sub-component: a single zone ─────────────────────────────────────── */
-function FridgeZone({
-  zone,
+/* ── Shelf zone config ────────────────────────────────────────────────── */
+const ZONE_STYLES = {
+  freeze: {
+    label: "冷冻室",
+    emoji: "❄️",
+    accent: "#CDBDFF",
+    bgColor: "#F1EBFF",
+    shelfColor: "#B8A8E8",
+  },
+  fridge: {
+    label: "冷藏室",
+    emoji: "🧊",
+    accent: "#BFE7FF",
+    bgColor: "#E8F6FF",
+    shelfColor: "#8ECAE6",
+  },
+};
+
+/* ── Food → zone partitioning ─────────────────────────────────────────── */
+function partitionByZone(foods: Food[]) {
+  const map = new Map<string, Food[]>();
+  map.set("freeze", []);
+  map.set("fridge", []);
+  for (const f of foods) {
+    map.get(f.zone)?.push(f);
+  }
+  return map;
+}
+
+/* ── Single shelf/compartment ─────────────────────────────────────────── */
+function FridgeShelf({
+  zoneKey,
   items,
-  onFoodClick,
   onSelect,
   onEdit,
   onDelete,
   index,
 }: {
-  zone: ZoneDef;
+  zoneKey: string;
   items: Food[];
-  onFoodClick?: (food: Food) => void;
   onSelect?: (food: Food) => void;
   onEdit?: (food: Food) => void;
   onDelete?: (food: Food) => void;
   index: number;
 }) {
+  const zone = ZONE_STYLES[zoneKey as keyof typeof ZONE_STYLES];
   const { selectedSet } = useFridgeStore();
 
-  const isFoodSelected = (id: string) => {
-    const f = items.find((x) => x.id === id);
-    if (f?.ingredientId) return selectedSet.has(f.ingredientId);
-    return selectedSet.has(String(id));
+  const isFoodSelected = (food: Food) => {
+    const id = food.ingredientId ?? String(food.id);
+    return selectedSet.has(id);
   };
-
-  const isEmpty = items.length === 0;
 
   return (
     <motion.div
-      className="relative w-full shrink-0 overflow-hidden"
-      style={{ height: `${zone.heightFraction * 100}%` }}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.45,
-        delay: 0.07 * index,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
+      transition={{ delay: index * 0.12, duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
-      {/* ── Zone separator edge ── */}
-      <div
-        className="absolute left-0 right-0 z-20"
-        style={{
-          top: 0,
-          height: "5px",
-          background: `linear-gradient(180deg, ${zone.accent}99 0%, ${zone.accent}44 100%)`,
-          boxShadow: "0 1px 3px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.4)",
-          borderRadius: "2px 2px 0 0",
-        }}
-      />
-
-      {/* ── Zone header label ── */}
-      <div className="absolute left-2 top-2 z-30 flex items-center gap-2">
-        <span className="text-[9px] font-semibold text-white/80 drop-shadow-sm tracking-[1px]">
-          {zone.label.toUpperCase()}
+      {/* Shelf label */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <span className="text-[11px]">{zone.emoji}</span>
+        <span className="text-[12px] font-semibold tracking-[0.3px]" style={{ color: "var(--color-ink)" }}>
+          {zone.label}
         </span>
-        <span className="text-[8px] font-mono text-white/50">({zone.temp})</span>
-        {!isEmpty && (
-          <span className="text-[8px] font-medium text-white/40">{items.length}</span>
+        {items.length > 0 && (
+          <span className="text-[10px]" style={{ color: "var(--color-ink-muted)" }}>
+            {items.length}
+          </span>
         )}
       </div>
 
-      {/* ── Content area ── */}
-      <div className="absolute inset-0 top-[5px] overflow-y-auto px-1.5 pt-7 pb-1.5">
-        {isEmpty ? (
-          <div className="flex h-full items-center justify-center">
-            <span className="text-[10px] tracking-[1.5px]" style={{ color: "rgba(255,255,255,0.18)" }}>
-              —— EMPTY ——
-            </span>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5">
-            {items.map((food) => (
-              <div key={food.id} className="aspect-square min-h-0">
+      {/* Compartment */}
+      <div
+        className="relative"
+        style={FRIDGE_OUTER_STYLE}
+      >
+        <div
+          className="absolute left-0 top-0 h-full w-[20%]"
+          style={FRIDGE_DOOR_STYLE}
+        />
+        <div
+          className="absolute right-0 top-0 h-full w-[20%]"
+          style={FRIDGE_DOOR_STYLE}
+        />
+        <div
+          className="relative z-10 flex flex-col gap-4 p-4"
+          style={FRIDGE_SHELF_STYLE}
+        >
+          {items.length === 0 ? (
+            <div className="flex items-center justify-center py-4">
+              <span
+                className="text-[11px] font-medium tracking-[0.5px]"
+                style={{ color: zone.accent + "80" }}
+              >
+                -- 空的 --
+              </span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+              {items.map((food) => (
                 <FoodCard
+                  key={food.id}
                   food={food}
-                  isSelected={isFoodSelected(food.id)}
-                  onSelect={(f) => (onSelect ? onSelect(f) : onFoodClick?.(f))}
+                  isSelected={isFoodSelected(food)}
+                  onSelect={(f) => onSelect?.(f)}
                   onEdit={onEdit}
                   onDelete={onDelete}
                 />
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Shelf accent strip */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[3px]"
+          style={{
+            background: `linear-gradient(90deg, transparent 5%, ${zone.shelfColor} 30%, ${zone.shelfColor} 70%, transparent 95%)`,
+            opacity: 0.3,
+          }}
+        />
       </div>
     </motion.div>
   );
@@ -165,7 +145,6 @@ function FridgeZone({
 /* ── Main component ───────────────────────────────────────────────────── */
 export const FridgeVisualBackground = React.memo(function FridgeVisualBackground({
   foods,
-  onFoodClick,
   onSelect,
   onEdit,
   onDelete,
@@ -173,80 +152,41 @@ export const FridgeVisualBackground = React.memo(function FridgeVisualBackground
 }: FridgeVisualBackgroundProps) {
   const zoneMap = useMemo(() => partitionByZone(foods), [foods]);
 
+  const shelves = useMemo(
+    () => [
+      { key: "freeze", items: zoneMap.get("freeze") ?? [] },
+      { key: "fridge", items: zoneMap.get("fridge") ?? [] },
+    ],
+    [zoneMap],
+  );
+
+  const anyFood = foods.length > 0;
+
   return (
-    <div className={`flex items-center justify-center ${className}`}>
-      {/* ── Outer fridge body ── */}
-      <motion.div
-        className="w-full rounded-[16px] overflow-hidden relative"
-        style={{
-          maxWidth: "min(92vw, 520px)",
-          height: "clamp(480px, 80vh, 720px)",
-          background: "linear-gradient(160deg, #dad6cf 0%, #c8c3ba 50%, #b8b2a8 100%)",
-          boxShadow: `
-            0 8px 32px rgba(0,0,0,0.12),
-            0 0 0 1px rgba(255,255,255,0.20) inset,
-            0 1px 0 0 rgba(0,0,0,0.06) inset
-          `,
-        }}
-        initial={{ opacity: 0, scale: 0.94 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      >
-        {/* ── Door seal strip ── */}
-        <div className="absolute inset-x-0 top-0 z-30 h-1.5 rounded-t-[16px]"
-          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, transparent 100%)" }}
-        />
-
-        {/* ── Interior chamber ── */}
+    <div className={`flex flex-col gap-3 ${className}`}>
+      {/* Zone shelves */}
+      {anyFood ? (
         <div
-          className="absolute inset-[2px] rounded-[14px] overflow-hidden"
-          style={{
-            background: `
-              radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.30) 0%, transparent 65%),
-              linear-gradient(180deg, #f4f2ef 0%, #e8e5e0 50%, #ddd9d3 100%)
-            `,
-            boxShadow: "inset 0 4px 20px rgba(0,0,0,0.08), inset 0 1px 2px rgba(0,0,0,0.04)",
-          }}
+          className="relative"
+          style={FRIDGE_OUTER_STYLE}
         >
-          {/* ── Back-panel fine texture ── */}
           <div
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
-            style={{
-              backgroundImage: `
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 3px)
-              `,
-            }}
+            className="absolute left-0 top-0 h-full w-[20%]"
+            style={FRIDGE_DOOR_STYLE}
           />
-
-          {/* ── Top light glow ── */}
           <div
-            className="absolute top-0 left-[8%] right-[8%] h-14 z-0 rounded-full"
-            style={{
-              background: "radial-gradient(ellipse at center, rgba(255,255,235,0.35) 0%, transparent 70%)",
-              filter: "blur(6px)",
-            }}
+            className="absolute right-0 top-0 h-full w-[20%]"
+            style={FRIDGE_DOOR_STYLE}
           />
-
-          {/* ── Shelves container ── */}
-          <div className="relative z-[1] flex flex-col h-full px-1 pb-1">
-            {/* Status bar */}
-            <div className="flex items-center justify-between px-2 h-7 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_4px_rgba(52,211,153,0.6)]" />
-                <span className="text-[8px] font-semibold text-black/30 tracking-[1px]">COOLING</span>
-              </div>
-              <span className="text-[8px] font-mono font-semibold text-black/25">
-                {new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
-              </span>
-            </div>
-
-            {/* Zones: freezer + fridge */}
-            {ZONES.map((zone, i) => (
-              <FridgeZone
-                key={zone.key}
-                zone={zone}
-                items={zoneMap.get(zone.key) ?? []}
-                onFoodClick={onFoodClick}
+          <div
+            className="relative z-10 flex flex-col gap-4 p-4"
+            style={FRIDGE_SHELF_STYLE}
+          >
+            {shelves.map((shelf, i) => (
+              <FridgeShelf
+                key={shelf.key}
+                zoneKey={shelf.key}
+                items={shelf.items}
                 onSelect={onSelect}
                 onEdit={onEdit}
                 onDelete={onDelete}
@@ -255,15 +195,36 @@ export const FridgeVisualBackground = React.memo(function FridgeVisualBackground
             ))}
           </div>
         </div>
-
-        {/* ── Frame border accent ── */}
-        <div
-          className="absolute inset-0 pointer-events-none rounded-[16px]"
-          style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.25), inset 0 0 0 2px rgba(0,0,0,0.04)" }}
-        />
-      </motion.div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-10">
+          <span className="text-3xl mb-2 animate-float">🥬</span>
+          <p className="text-[13px] font-medium" style={{ color: "var(--color-ink-soft)" }}>
+            冰箱空空的
+          </p>
+          <p className="text-[11px]" style={{ color: "var(--color-ink-muted)" }}>
+            快去扫点食材吧
+          </p>
+        </div>
+      )}
     </div>
   );
 });
 
-export { ZONES, partitionByZone, zoneKeyForFood };
+export { partitionByZone };
+
+const FRIDGE_OUTER_STYLE = {
+  background: "#FFFDF8",
+  border: "2px solid #F3EFE8",
+  boxShadow: "0 4px 12px rgba(43, 43, 43, 0.1)",
+  borderRadius: "16px",
+};
+
+const FRIDGE_DOOR_STYLE = {
+  background: "#FFE7BF",
+  border: "1.5px solid #F3EFE8",
+};
+
+const FRIDGE_SHELF_STYLE = {
+  background: "#E8F6FF",
+  border: "1px solid #BFE7FF",
+};

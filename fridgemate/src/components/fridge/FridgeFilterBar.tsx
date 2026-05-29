@@ -14,14 +14,6 @@ interface FridgeFilterBarProps {
   zones: Array<{ key: string; label: string }>;
 }
 
-/**
- * FridgeFilterBar
- *
- * Mobile  (<768px):  horizontally scrollable pill row, sits atop the fridge
- * Tablet+ (md+):     vertical stacked tag bar on the left side
- *
- * Both views share the same options — "冷藏" "冷冻" + all category tags.
- */
 export function FridgeFilterBar({
   mode,
   selectedKey,
@@ -37,7 +29,6 @@ export function FridgeFilterBar({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll selected into view on mobile
   useEffect(() => {
     if (!scrollRef.current) return;
     const active = scrollRef.current.querySelector(`[data-key="${selectedKey}"]`);
@@ -47,108 +38,60 @@ export function FridgeFilterBar({
   }, [selectedKey]);
 
   return (
-    <>
-      {/* ── Mobile: horizontal scroll bar ── */}
-      <div className="md:hidden">
-        {/* Mode toggle row */}
-        <div className="flex gap-2 mb-3">
-          <button
-            type="button"
-            onClick={() => onModeChange("zone")}
-            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-              mode === "zone"
-                ? "bg-[#1a1a1a] text-white shadow-sm"
-                : "bg-[#f0efed] text-[#787671]"
-            }`}
-          >
-            按区域
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange("category")}
-            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-              mode === "category"
-                ? "bg-[#1a1a1a] text-white shadow-sm"
-                : "bg-[#f0efed] text-[#787671]"
-            }`}
-          >
-            按种类
-          </button>
-        </div>
-
-        {/* Horizontal scrollable pills */}
-        <div
-          ref={scrollRef}
-          className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+    <div className="space-y-2">
+      <div className="inline-flex rounded-full bg-[var(--color-surface)] p-0.5">
+        <button
+          type="button"
+          onClick={() => onModeChange("zone")}
+          className="rounded-full px-3 py-1.5 text-[12px] font-semibold transition-all"
+          style={{
+            backgroundColor: mode === "zone" ? "var(--color-primary)" : "transparent",
+            color: mode === "zone" ? "var(--color-on-primary)" : "var(--color-ink-muted)",
+          }}
         >
-          {allOptions.map((opt) => (
-            <button
+          按区域
+        </button>
+        <button
+          type="button"
+          onClick={() => onModeChange("category")}
+          className="rounded-full px-3 py-1.5 text-[12px] font-semibold transition-all"
+          style={{
+            backgroundColor: mode === "category" ? "var(--color-primary)" : "transparent",
+            color: mode === "category" ? "var(--color-on-primary)" : "var(--color-ink-muted)",
+          }}
+        >
+          按种类
+        </button>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="flex gap-2 overflow-x-auto pb-1"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {allOptions.map((opt) => {
+          const isActive = selectedKey === opt.key;
+          return (
+            <motion.button
               key={opt.key}
               data-key={opt.key}
               type="button"
               onClick={() => onSelectKey(opt.key)}
-              className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                selectedKey === opt.key
-                  ? "bg-[#5645d4] text-white shadow-sm"
-                  : "bg-white border border-[#e0ddd7] text-[#5d5b54]"
-              }`}
+              className="shrink-0 rounded-full border border-[var(--color-hairline)] px-4 py-2 text-[12px] font-semibold transition-all"
+              whileTap={{ scale: 0.95 }}
+              style={{
+                backgroundColor: isActive ? "var(--color-primary)" : "var(--color-surface-elevated)",
+                color: isActive ? "var(--color-on-primary)" : "var(--color-ink-soft)",
+                boxShadow: isActive
+                  ? "0 4px 12px rgba(123, 207, 142, 0.25)"
+                  : "0 2px 6px rgba(43, 43, 43, 0.04)",
+              }}
             >
               {opt.label}
-            </button>
-          ))}
-        </div>
+            </motion.button>
+          );
+        })}
       </div>
-
-      {/* ── Tablet+: vertical tag bar ── */}
-      <div className="hidden md:block">
-        {/* Mode switch pills */}
-        <div className="flex gap-2 mb-4">
-          <button
-            type="button"
-            onClick={() => onModeChange("zone")}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
-              mode === "zone"
-                ? "bg-[#1a1a1a] text-white"
-                : "border border-[#e5e3df] text-[#787671] bg-transparent"
-            }`}
-            style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
-          >
-            按区域
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange("category")}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
-              mode === "category"
-                ? "bg-[#1a1a1a] text-white"
-                : "border border-[#e5e3df] text-[#787671] bg-transparent"
-            }`}
-            style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
-          >
-            按种类
-          </button>
-        </div>
-
-        {/* Vertical tags */}
-        <div className="flex flex-col gap-2">
-          {allOptions.map((opt) => (
-            <button
-              key={opt.key}
-              type="button"
-              onClick={() => onSelectKey(opt.key)}
-              className={`rounded-[8px] px-3 py-2 text-sm text-left transition-all border ${
-                selectedKey === opt.key
-                  ? "border-[#1a1a1a] bg-[#1a1a1a] text-white"
-                  : "border-[#e5e3df] bg-white text-[#5d5b54]"
-              }`}
-              style={{ fontSize: "14px", fontWeight: 500, lineHeight: 1.5 }}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

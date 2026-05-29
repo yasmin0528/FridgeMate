@@ -44,8 +44,26 @@ export function SlotMachine({ candidates, finalPick, onDone }: Props) {
 
   const current = candidates[idx] ?? finalPick;
   return (
-    <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50">
-      <div className="w-72 h-40 bg-white rounded-2xl flex items-center justify-center overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{
+        background: "rgba(43, 43, 43, 0.25)",
+        backdropFilter: "blur(4px)",
+      }}
+    >
+      {/* Large clay card for the slot window */}
+      <div
+        className="flex flex-col items-center justify-center overflow-hidden"
+        style={{
+          background: "var(--color-surface-elevated)",
+          borderRadius: "32px",
+          padding: "32px 48px",
+          minWidth: 280,
+          minHeight: 140,
+          boxShadow:
+            "0 8px 24px rgba(43, 43, 43, 0.10), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 -1px 0 rgba(43, 43, 43, 0.03) inset",
+        }}
+      >
         <AnimatePresence mode="popLayout">
           <motion.div
             key={current.id}
@@ -55,13 +73,21 @@ export function SlotMachine({ candidates, finalPick, onDone }: Props) {
             transition={{ duration: 0.15 }}
             className="text-center px-4"
           >
-            <div className="text-2xl font-semibold">{current.name}</div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div
+              className="text-h1"
+              style={{ color: "var(--color-ink)", whiteSpace: "nowrap" }}
+            >
+              {current.name}
+            </div>
+            <div
+              className="text-small mt-2"
+              style={{ color: "var(--color-ink-muted)" }}
+            >
               {current.kcal} kcal · {current.cookTimeMin} 分钟
             </div>
             {stopped && (
               <div
-                className="text-xs mt-2"
+                className="text-small mt-3 font-semibold"
                 style={{ color: "var(--color-primary)" }}
               >
                 ✨ 就是你了

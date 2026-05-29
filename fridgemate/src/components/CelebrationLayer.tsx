@@ -36,6 +36,8 @@ function buildParticles(count: number): ParticleSpec[] {
   }));
 }
 
+const PARTICLE_EMOJIS = ["✨", "🎉", "💫", "🌟", "🌸", "⭐"];
+
 export function CelebrationLayer({
   oldStreak,
   newStreak,
@@ -72,14 +74,15 @@ export function CelebrationLayer({
       className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
       style={{
         background:
-          "radial-gradient(circle at center, #10B981 0%, #059669 60%, #064E3B 100%)",
+          "radial-gradient(circle at 30% 20%, var(--color-card-mint) 0%, var(--color-card-banana) 30%, var(--color-card-strawberry) 60%, var(--color-card-lavender) 100%)",
       }}
       onClick={onDismiss}
     >
+      {/* Floating sparkle particles */}
       {particles.map((p, i) => (
         <motion.span
           key={i}
-          className="absolute text-3xl"
+          className="absolute text-3xl floating-element"
           initial={{
             x: 0,
             y: 0,
@@ -99,17 +102,70 @@ export function CelebrationLayer({
             ease: "easeOut",
           }}
         >
-          {["✨", "🎉", "💫", "🌟"][i % 4]}
+          {PARTICLE_EMOJIS[i % PARTICLE_EMOJIS.length]}
         </motion.span>
       ))}
-      <div className="text-white text-2xl font-semibold mb-6 px-8 text-center">
-        {message}
-      </div>
-      <div className="text-white text-7xl font-bold flex items-center gap-2">
-        🔥 {displayStreak}
-      </div>
-      <div className="text-white/80 mt-2">连续 {displayStreak} 天</div>
-      <div className="text-white/60 text-xs mt-8">点击或等待 3 秒返回</div>
+
+      {/* Warm clay card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+        className="clay-card flex flex-col items-center px-10 py-10 min-w-[280px] z-10"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          borderRadius: "32px",
+          backgroundColor: "rgba(255, 253, 248, 0.92)",
+        }}
+      >
+        {/* Encouragement message */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.4 }}
+          className="text-h2 text-center mb-8 px-2"
+          style={{ color: "var(--color-ink)" }}
+        >
+          {message}
+        </motion.div>
+
+        {/* Streak number with animated count */}
+        <motion.div
+          key={displayStreak}
+          initial={{ scale: 1.3, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", damping: 12, stiffness: 200 }}
+          className="flex items-center gap-3 animate-float"
+          style={{ fontSize: "64px", fontWeight: 700, lineHeight: 1 }}
+        >
+          <span>🔥</span>
+          <span style={{ color: "var(--color-primary)" }}>
+            {displayStreak}
+          </span>
+        </motion.div>
+
+        {/* Streak label */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="mt-3 text-small"
+          style={{ color: "var(--color-ink-muted)" }}
+        >
+          连续 {displayStreak} 天
+        </motion.div>
+
+        {/* Dismiss hint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ delay: 1 }}
+          className="mt-8 text-caption"
+          style={{ color: "var(--color-ink-muted)" }}
+        >
+          点击或等待 3 秒返回
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
