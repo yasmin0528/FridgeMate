@@ -58,11 +58,11 @@ export default function FridgePage() {
       const food: Food = {
         id: item.ingredientId,
         ingredientId: item.ingredientId,
-        name: ingredient?.name ?? item.name ?? "未命名食材",
+        name: item.name ?? ingredient?.name ?? "未命名食材",
         count: item.qty,
         expire: item.shelfLife,
         category: item.category
-          ? SCAN_CATEGORY_MAP[item.category]
+          ? (SCAN_CATEGORY_MAP[item.category] ?? item.category)
           : ingredient
             ? CATEGORY_MAP[ingredient.category] ?? "other"
             : "other",
@@ -162,12 +162,12 @@ export default function FridgePage() {
           onEdit={handleEditFood}
           onDelete={handleRemoveFood}
         />
-
-        <SelectedFridgeBar
-          open={showSelectedBar}
-          onClose={() => setShowSelectedBar(false)}
-        />
       </div>
+
+      <SelectedFridgeBar
+        open={showSelectedBar}
+        onClose={() => setShowSelectedBar(false)}
+      />
     </main>
   );
 }

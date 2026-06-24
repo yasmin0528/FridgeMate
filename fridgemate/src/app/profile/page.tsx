@@ -63,12 +63,14 @@ export default function ProfilePage() {
 
   return (
     <motion.main
-      className="px-4 py-6 flex flex-col gap-5"
+      className="px-4 py-6 mx-auto"
+      style={{ maxWidth: 960 }}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      style={{ maxWidth: 414, margin: "0 auto" }}
     >
+      {/* Desktop: 2-column layout wrapper */}
+      <div className="flex flex-col gap-5 md:grid md:grid-cols-2 md:gap-6">
       {/* ===== 游戏角色卡片 ===== */}
       <motion.section
         className="clay-card overflow-hidden relative"
@@ -224,6 +226,7 @@ export default function ProfilePage() {
       <motion.div variants={itemVariants}>
         <RecentCookingList history={history} />
       </motion.div>
+    </div>
     </motion.main>
   );
 }

@@ -77,7 +77,7 @@ export default function RecipesPage() {
   };
 
   return (
-    <main className="px-4 py-6 flex flex-col gap-5" style={{ maxWidth: 414, margin: "0 auto" }}>
+    <main className="px-4 py-6 mx-auto" style={{ maxWidth: 960 }}>
       {/* Sticky header */}
       <motion.header
         initial={{ opacity: 0, y: -12 }}
@@ -198,8 +198,8 @@ export default function RecipesPage() {
         ))}
       </motion.div>
 
-      {/* Recipe list */}
-      <ul className="flex flex-col gap-3">
+      {/* Recipe list — responsive grid: single column on mobile, 2 columns on desktop */}
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <AnimatePresence>
           {sorted.map((sr, i) => (
             <motion.li
@@ -245,10 +245,10 @@ function RecipeCard({
       className="block bento-cell"
       style={{ backgroundColor: tint }}
     >
-      <div className="p-4 flex gap-4 items-center">
+      <div className="p-4 flex gap-4 items-center md:p-5">
         {/* Emoji avatar */}
         <div
-          className="w-[68px] h-[68px] rounded-2xl flex items-center justify-center text-3xl shrink-0"
+          className="w-[68px] h-[68px] md:w-[80px] md:h-[80px] rounded-2xl flex items-center justify-center text-3xl md:text-4xl shrink-0"
           style={{
             backgroundColor: "rgba(255,255,255,0.7)",
             boxShadow: "0 2px 8px rgba(43,43,43,0.05), 0 0 0 1px rgba(255,255,255,0.5) inset",

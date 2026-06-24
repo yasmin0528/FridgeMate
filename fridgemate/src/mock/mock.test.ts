@@ -8,12 +8,12 @@ import { MOCK_RECIPES, RECIPE_BY_ID } from "./recipes";
 import type { IngredientCategory } from "@/types";
 
 describe("MOCK_INGREDIENTS data integrity", () => {
-  it("contains 50 fridge items + 3 pantry items = 53 total", () => {
+  it("contains 63 fridge items + 3 pantry items = 66 total", () => {
     const fridge = MOCK_INGREDIENTS.filter((i) => !i.isPantry);
     const pantry = MOCK_INGREDIENTS.filter((i) => i.isPantry);
-    expect(fridge).toHaveLength(50);
+    expect(fridge).toHaveLength(63);
     expect(pantry).toHaveLength(3);
-    expect(MOCK_INGREDIENTS).toHaveLength(53);
+    expect(MOCK_INGREDIENTS).toHaveLength(66);
   });
 
   it("all ingredient ids are unique", () => {
@@ -52,17 +52,17 @@ describe("MOCK_INGREDIENTS data integrity", () => {
     }
   });
 
-  it("category distribution matches v2 spec (13/17/3/9/5/3/3)", () => {
+  it("category distribution (15/21/5/10/5/7/3)", () => {
     const byCat: Record<string, number> = {};
     for (const i of MOCK_INGREDIENTS) {
       byCat[i.category] = (byCat[i.category] ?? 0) + 1;
     }
-    expect(byCat.protein).toBe(13);
-    expect(byCat.veg).toBe(17);
+    expect(byCat.protein).toBe(15);
+    expect(byCat.veg).toBe(21);
     expect(byCat.aromatic).toBe(5);
-    expect(byCat.seasoning).toBe(9);
-    expect(byCat.dairy).toBe(3);
-    expect(byCat.fruit).toBe(3);
+    expect(byCat.seasoning).toBe(10);
+    expect(byCat.dairy).toBe(5);
+    expect(byCat.fruit).toBe(7);
     expect(byCat.carb).toBe(3); // all pantry
   });
 
@@ -74,7 +74,7 @@ describe("MOCK_INGREDIENTS data integrity", () => {
   });
 
   it("FRIDGE_INGREDIENTS excludes all pantry items", () => {
-    expect(FRIDGE_INGREDIENTS).toHaveLength(50);
+    expect(FRIDGE_INGREDIENTS).toHaveLength(63);
     for (const i of FRIDGE_INGREDIENTS) {
       expect(i.isPantry).not.toBe(true);
     }
@@ -107,8 +107,8 @@ describe("MOCK_INGREDIENTS data integrity", () => {
 });
 
 describe("MOCK_RECIPES data integrity", () => {
-  it("contains exactly 28 recipes", () => {
-    expect(MOCK_RECIPES).toHaveLength(28);
+  it("contains exactly 34 recipes", () => {
+    expect(MOCK_RECIPES).toHaveLength(34);
   });
 
   it("all recipe ids are unique", () => {

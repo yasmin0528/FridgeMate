@@ -72,6 +72,15 @@ export const FoodCard = React.memo(function FoodCard({
     food.status ?? "fresh",
   );
 
+  // Sync local edit state when food prop changes (e.g. after edit saved from another card)
+  React.useEffect(() => {
+    setEditName(food.name);
+    setEditCount(String(food.count));
+    setEditExpire(food.expire);
+    setEditZone(food.zone);
+    setEditStatus(food.status ?? "fresh");
+  }, [food.name, food.count, food.expire, food.zone, food.status]);
+
   const handleSaveEdit = useCallback(() => {
     const updated: Food = {
       ...food,

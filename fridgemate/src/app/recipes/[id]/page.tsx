@@ -91,12 +91,12 @@ export default function RecipeDetailPage({ params }: PageProps) {
   const videoHref = recipe.videoUrl ?? searchUrl;
 
   return (
-    <main className="flex flex-col" style={{ maxWidth: 414, margin: "0 auto" }}>
+    <main className="mx-auto px-4" style={{ maxWidth: 960 }}>
       {/* Sticky header */}
       <motion.header
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between px-4 py-3 sticky top-0 z-10"
+        className="flex items-center justify-between px-0 py-3 sticky top-0 z-10"
         style={{
           backgroundColor: "var(--color-canvas)",
           borderBottom: "1px solid var(--color-hairline-soft)",
@@ -129,8 +129,13 @@ export default function RecipeDetailPage({ params }: PageProps) {
         </button>
       </motion.header>
 
+      {/* Responsive grid: single column on mobile, 2 columns on desktop */}
+      <div className="flex flex-col gap-6 md:grid md:grid-cols-2 md:gap-8 md:py-4">
+        {/* Left column: hero + info */}
+        <div className="flex flex-col gap-4">
+
       {/* Hero section */}
-      <section className="px-4 py-4 flex flex-col gap-4">
+      <section className="flex flex-col gap-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -292,9 +297,12 @@ export default function RecipeDetailPage({ params }: PageProps) {
           </>
         )}
       </motion.section>
+        </div>{/* end left column */}
 
-      {/* Cooking steps section */}
-      <section className="px-4 py-4 flex flex-col gap-4">
+        {/* Right column: cooking steps */}
+        <div className="flex flex-col gap-4">
+
+      <section className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           {/* Progress bar */}
           <div className="flex-1 h-2 rounded-full" style={{ backgroundColor: "var(--color-surface)" }}>
@@ -413,6 +421,8 @@ export default function RecipeDetailPage({ params }: PageProps) {
           )}
         </div>
       </section>
+        </div>{/* end right column */}
+      </div>{/* end responsive grid */}
 
       {/* Timer overlay */}
       {timerMin !== null && (

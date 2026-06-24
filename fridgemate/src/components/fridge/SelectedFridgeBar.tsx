@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useFridgeStore } from "@/store/fridgeStore";
 import { INGREDIENT_BY_ID } from "@/mock/ingredients";
@@ -17,6 +18,11 @@ export const SelectedFridgeBar = React.memo(function SelectedFridgeBar({
 }: SelectedFridgeBarProps) {
   const { selectedIds, toggleSelect, clearSelection } = useFridgeStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleConfirm = useCallback(() => {
     if (selectedIds.length === 0) return;
@@ -24,11 +30,11 @@ export const SelectedFridgeBar = React.memo(function SelectedFridgeBar({
     router.push("/recipes");
   }, [onClose, router, selectedIds.length]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <motion.div
-      className="fixed bottom-0 left-0 right-0 z-40"
+      className="fixed bottom-20 left-0 right-0 z-50"
       style={{
         background: "rgba(255, 253, 248, 0.95)",
         backdropFilter: "blur(16px)",
@@ -96,6 +102,7 @@ export const SelectedFridgeBar = React.memo(function SelectedFridgeBar({
           看看能做什么菜
         </button>
       </div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 });

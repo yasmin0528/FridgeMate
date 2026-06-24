@@ -52,16 +52,33 @@ export const MOCK_INGREDIENTS: Ingredient[] = [
   { id: "cooking_wine", name: "料酒", category: "seasoning", emoji: "🍶" },
   { id: "sesame_oil", name: "香油", category: "seasoning", emoji: "🫗" },
   { id: "oyster_sauce", name: "蚝油", category: "seasoning", emoji: "🦪" },
+  { id: "honey", name: "蜂蜜", category: "seasoning", emoji: "🍯" },
 
-  // ─── dairy (3) ────────────────────────────────────────
+  // ─── dairy (5) ────────────────────────────────────────
   { id: "milk", name: "牛奶", category: "dairy", emoji: "🥛", shelfLifeDays: 7 },
   { id: "yogurt", name: "酸奶", category: "dairy", emoji: "🍶", shelfLifeDays: 14 },
   { id: "cheese", name: "奶酪", category: "dairy", emoji: "🧀", shelfLifeDays: 21 },
+  { id: "butter", name: "黄油", category: "dairy", emoji: "🧈", shelfLifeDays: 60 },
+  { id: "cream", name: "淡奶油", category: "dairy", emoji: "🥛", shelfLifeDays: 14 },
 
-  // ─── fruit (3) ────────────────────────────────────────
+  // ─── fruit (7) ────────────────────────────────────────
   { id: "apple", name: "苹果", category: "fruit", emoji: "🍎", shelfLifeDays: 14 },
   { id: "banana", name: "香蕉", category: "fruit", emoji: "🍌", shelfLifeDays: 5 },
   { id: "blueberry", name: "蓝莓", category: "fruit", emoji: "🫐", shelfLifeDays: 7 },
+  { id: "strawberry", name: "草莓", category: "fruit", emoji: "🍓", shelfLifeDays: 5 },
+  { id: "orange", name: "橙子", category: "fruit", emoji: "🍊", shelfLifeDays: 14 },
+  { id: "grape", name: "葡萄", category: "fruit", emoji: "🍇", shelfLifeDays: 7 },
+  { id: "kiwi", name: "猕猴桃", category: "fruit", emoji: "🥝", shelfLifeDays: 10 },
+
+  // ─── veg+ (4 more for variety) ────────────────────────
+  { id: "corn", name: "玉米", category: "veg", emoji: "🌽", shelfLifeDays: 30 },
+  { id: "sweet_potato", name: "红薯", category: "veg", emoji: "🍠", shelfLifeDays: 30 },
+  { id: "celery", name: "芹菜", category: "veg", emoji: "🥬", shelfLifeDays: 7 },
+  { id: "lettuce", name: "生菜", category: "veg", emoji: "🥬", shelfLifeDays: 5 },
+
+  // ─── protein+ (2 more) ────────────────────────────────
+  { id: "duck", name: "鸭肉", category: "protein", emoji: "🍗", shelfLifeDays: 3 },
+  { id: "clam", name: "蛤蜊", category: "protein", emoji: "🐚", shelfLifeDays: 2 },
 
   // ─── pantry (3, isPantry=true) ────────────────────────
   { id: "rice", name: "米饭", category: "carb", emoji: "🍚", isPantry: true },
